@@ -20,11 +20,29 @@ const TypingTestTextBox = ({ words, wordsAmount }: Props) => {
   const handleKeyPress = (event: KeyboardEvent<HTMLDivElement>) => {
     const key = event.key;
 
-    if (untypedChars.length === 0) return;
+    if (
+      (untypedChars.length === 0 && errorChars.length === 0) ||
+      key === "Dead"
+    )
+      return;
 
-    if (key === untypedChars[0]) {
+    if (key === "Backspace") {
+      if (errorChars.length > 0) {
+        setErrorChars(errorChars.slice(0, -1));
+      } else if (typedChars.length > 0) {
+        setUntypedChars(typedChars[typedChars.length - 1] + untypedChars);
+        setTypedChars(typedChars.slice(0, -1));
+      }
+      return;
+    }
+
+    if (key.length !== 1) return;
+
+    if (errorChars.length === 0 && key === untypedChars[0]) {
       setTypedChars(typedChars + untypedChars[0]);
       setUntypedChars(untypedChars.slice(1));
+    } else {
+      setErrorChars(errorChars + key);
     }
   };
 
@@ -36,18 +54,28 @@ const TypingTestTextBox = ({ words, wordsAmount }: Props) => {
 
   // Strings containing the contents of the typing test text box
   let [typedChars, setTypedChars] = useState("");
+  let [errorChars, setErrorChars] = useState("");
   let [untypedChars, setUntypedChars] = useState(
     generateRandomWordListString(words)
   );
 
   return (
-    <div onKeyDown={(event) => handleKeyPress(event)} ref={boxRef} tabIndex={0}>
-      <p className="text-secondary" style={{ whiteSpace: "pre" }}>
+    <div
+      className="d-flex"
+      onKeyDown={(event) => handleKeyPress(event)}
+      ref={boxRef}
+      tabIndex={0}
+    >
+      <span className="text-primary" style={{ whiteSpace: "pre" }}>
         {typedChars}
-      </p>
-      <p className="text-dark" style={{ whiteSpace: "pre" }}>
+      </span>
+      <span className="text-danger" style={{ whiteSpace: "pre" }}>
+        {errorChars}
+      </span>
+      <span>|</span>
+      <span className="text-dark" style={{ whiteSpace: "pre" }}>
         {untypedChars}
-      </p>
+      </span>
     </div>
   );
 };
