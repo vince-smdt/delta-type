@@ -1,11 +1,12 @@
 import TypingTestTextBox from "./components/TypingTestTextBox";
+import "./App.css";
 
 function App() {
   const words = ["test", "hello", "world", "testing", "typing"];
-  const length = 100;
+  const length = 10;
 
   return (
-    <div>
+    <div id="global-box">
       <TypingTestTextBox words={words} wordsAmount={length} />
     </div>
   );

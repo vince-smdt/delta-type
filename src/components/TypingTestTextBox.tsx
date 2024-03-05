@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, KeyboardEvent } from "react";
+import "./styles/TypingTestTextBox.css";
 
 interface Props {
   words: string[];
@@ -13,18 +14,12 @@ const TypingTestTextBox = ({ words, wordsAmount }: Props) => {
       const randomWordIndex = Math.floor(Math.random() * words.length);
       wordListString += words[randomWordIndex] + " ";
     }
-    return wordListString;
+    return wordListString.trim();
   };
 
   // Handle key presses when typing test text box is focused
   const handleKeyPress = (event: KeyboardEvent<HTMLDivElement>) => {
     const key = event.key;
-
-    if (
-      (untypedChars.length === 0 && errorChars.length === 0) ||
-      key === "Dead"
-    )
-      return;
 
     if (key === "Backspace") {
       if (errorChars.length > 0) {
@@ -36,7 +31,13 @@ const TypingTestTextBox = ({ words, wordsAmount }: Props) => {
       return;
     }
 
-    if (key.length !== 1) return;
+    if (
+      (untypedChars.length === 0 && errorChars.length === 0) ||
+      key === "Dead"
+    )
+      return;
+
+    if (key.length !== 1) return; // On veut que les lettres (ex. exclus Ctrl)
 
     if (errorChars.length === 0 && key === untypedChars[0]) {
       setTypedChars(typedChars + untypedChars[0]);
@@ -66,16 +67,14 @@ const TypingTestTextBox = ({ words, wordsAmount }: Props) => {
       ref={boxRef}
       tabIndex={0}
     >
-      <span className="text-primary" style={{ whiteSpace: "pre" }}>
+      <div id="typed-chars" className="char-container text-primary">
         {typedChars}
-      </span>
-      <span className="text-danger" style={{ whiteSpace: "pre" }}>
-        {errorChars}
-      </span>
-      <span>|</span>
-      <span className="text-dark" style={{ whiteSpace: "pre" }}>
-        {untypedChars}
-      </span>
+      </div>
+      <div id="cursor"></div>
+      <div id="untyped-chars" className="char-container">
+        <span className="text-danger">{errorChars}</span>
+        <span className="text-dark">{untypedChars}</span>
+      </div>
     </div>
   );
 };

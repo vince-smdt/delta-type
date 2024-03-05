@@ -1,0 +1,18 @@
+.char-container {
+  overflow: hidden;
+  white-space: pre;
+}
+
+#typed-chars {
+  display: flex;
+  justify-content: flex-end;
+  width: 10em;
+}
+
+#cursor {
+  border-right: 1px black solid;
+}
+
+#untyped-chars {
+  width: 10em;
+}
