@@ -19,29 +19,86 @@ const TypingTestTextBox = forwardRef<HTMLDivElement, Props>((props, ref) => {
     return wordListString.trim();
   };
 
+  const backspace = () => {
+    if (errorChars.length > 0) {
+      setErrorChars(errorChars.slice(0, -1));
+    } else if (typedChars.length > 0) {
+      setUntypedChars(typedChars[typedChars.length - 1] + untypedChars);
+      setTypedChars(typedChars.slice(0, -1));
+    }
+  };
+
+  const ctrlBackspace = () => {
+    let allErrorCharsErased = false;
+    let charCondition = (str: string, index: number) => false;
+    let charConditionSet = false;
+
+    // Handle errorChars
+    if (errorChars.length > 0) {
+      let errorIndex = errorChars.length - 1;
+
+      // Condition for whether spaces or chars are being erased
+      charCondition =
+        errorChars[errorIndex] === " "
+          ? (chars: string, index: number) => chars[index] === " "
+          : (chars: string, index: number) => chars[index] !== " ";
+      charConditionSet = true;
+
+      // Erase error chars
+      while (charCondition(errorChars, errorIndex) && errorIndex >= 0)
+        errorIndex--;
+      setErrorChars(errorChars.slice(0, errorIndex + 1));
+
+      // Flag to specify so typedChars can also start being erased
+      console.log(errorIndex);
+      if (errorIndex === -1) allErrorCharsErased = true;
+    }
+
+    // Return if space/char already reached during ctrl+backspace of error chars
+    if (errorChars.length > 0 && !allErrorCharsErased) return;
+
+    // Handle typedChars
+    if (typedChars.length > 0) {
+      let typedIndex = typedChars.length - 1;
+
+      // Condition for whether spaces or chars are being erased
+      if (!charConditionSet)
+        charCondition =
+          typedChars[typedIndex] === " "
+            ? (chars: string, index: number) => chars[index] === " "
+            : (chars: string, index: number) => chars[index] !== " ";
+
+      // Erase typed chars
+      while (charCondition(typedChars, typedIndex) && typedIndex >= 0)
+        typedIndex--;
+      setUntypedChars(typedChars.slice(typedIndex + 1) + untypedChars);
+      setTypedChars(typedChars.slice(0, typedIndex + 1));
+    }
+  };
+
   // Handle key presses when typing test text box is focused
   const handleKeyPress = (event: React.KeyboardEvent<HTMLDivElement>) => {
     const key = event.key;
 
+    // Handle backspace
     if (key === "Backspace") {
-      if (errorChars.length > 0) {
-        setErrorChars(errorChars.slice(0, -1));
-      } else if (typedChars.length > 0) {
-        setUntypedChars(typedChars[typedChars.length - 1] + untypedChars);
-        setTypedChars(typedChars.slice(0, -1));
-      }
+      if (event.ctrlKey === true) ctrlBackspace();
+      else backspace();
       return;
     }
 
+    // Ignore specific keypresses
     if (
-      (untypedChars.length === 0 && errorChars.length === 0) ||
-      key === "Dead" ||
-      event.ctrlKey === true
+      (untypedChars.length === 0 && errorChars.length === 0) || // No more chars to type
+      key === "Dead" || // Dead keys that wait for next keystroke (Ex. ^ -> ê)
+      event.ctrlKey === true || // Excludes ctrl+key
+      event.altKey === true || // Excludes alt+key
+      event.metaKey === true || // Excludes meta+key
+      key.length !== 1 // Excludes non-letters (Ex. Shift)
     )
       return;
 
-    if (key.length !== 1) return; // Excludes non-letters (Ex. Ctrl)
-
+    // Handle typed character
     if (errorChars.length === 0 && key === untypedChars[0]) {
       setTypedChars(typedChars + untypedChars[0]);
       setUntypedChars(untypedChars.slice(1));
@@ -67,7 +124,7 @@ const TypingTestTextBox = forwardRef<HTMLDivElement, Props>((props, ref) => {
       <div id="typed-chars" className="char-container text-primary">
         {typedChars}
       </div>
-
+      <div id="cursor"></div>
       <div id="untyped-chars" className="char-container">
         <span className="text-danger">{errorChars}</span>
         <span className="text-dark">{untypedChars}</span>

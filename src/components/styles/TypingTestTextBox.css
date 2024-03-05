@@ -1,7 +1,9 @@
 .char-container {
   overflow: hidden;
   white-space: pre;
+  font-size: 40px;
   line-height: normal;
+  letter-spacing: 0.015em;
 
   font-family: "Aleo", serif;
   font-optical-sizing: auto;
