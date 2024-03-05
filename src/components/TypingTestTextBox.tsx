@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, KeyboardEvent } from "react";
+import { forwardRef, useRef, useEffect, useState, KeyboardEvent } from "react";
 import "./styles/TypingTestTextBox.css";
 
 interface Props {
@@ -6,7 +6,9 @@ interface Props {
   wordsAmount: number;
 }
 
-const TypingTestTextBox = ({ words, wordsAmount }: Props) => {
+const TypingTestTextBox = forwardRef<HTMLDivElement, Props>((props, ref) => {
+  const { words, wordsAmount } = props; // Extract props
+
   // Generates the string used for the typing test
   const generateRandomWordListString = (words: string[]) => {
     let wordListString = "";
@@ -18,7 +20,7 @@ const TypingTestTextBox = ({ words, wordsAmount }: Props) => {
   };
 
   // Handle key presses when typing test text box is focused
-  const handleKeyPress = (event: KeyboardEvent<HTMLDivElement>) => {
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLDivElement>) => {
     const key = event.key;
 
     if (key === "Backspace") {
@@ -33,11 +35,12 @@ const TypingTestTextBox = ({ words, wordsAmount }: Props) => {
 
     if (
       (untypedChars.length === 0 && errorChars.length === 0) ||
-      key === "Dead"
+      key === "Dead" ||
+      event.ctrlKey === true
     )
       return;
 
-    if (key.length !== 1) return; // On veut que les lettres (ex. exclus Ctrl)
+    if (key.length !== 1) return; // Excludes non-letters (Ex. Ctrl)
 
     if (errorChars.length === 0 && key === untypedChars[0]) {
       setTypedChars(typedChars + untypedChars[0]);
@@ -46,12 +49,6 @@ const TypingTestTextBox = ({ words, wordsAmount }: Props) => {
       setErrorChars(errorChars + key);
     }
   };
-
-  // Auto focuses the div containing the typing test
-  const boxRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    boxRef.current!.focus();
-  });
 
   // Strings containing the contents of the typing test text box
   let [typedChars, setTypedChars] = useState("");
@@ -64,19 +61,19 @@ const TypingTestTextBox = ({ words, wordsAmount }: Props) => {
     <div
       className="d-flex"
       onKeyDown={(event) => handleKeyPress(event)}
-      ref={boxRef}
+      ref={ref}
       tabIndex={0}
     >
       <div id="typed-chars" className="char-container text-primary">
         {typedChars}
       </div>
-      <div id="cursor"></div>
+
       <div id="untyped-chars" className="char-container">
         <span className="text-danger">{errorChars}</span>
         <span className="text-dark">{untypedChars}</span>
       </div>
     </div>
   );
-};
+});
 
 export default TypingTestTextBox;

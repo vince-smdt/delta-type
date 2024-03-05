@@ -1,6 +1,12 @@
 .char-container {
   overflow: hidden;
   white-space: pre;
+  line-height: normal;
+
+  font-family: "Aleo", serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
 }
 
 #typed-chars {
