@@ -1,18 +1,19 @@
 import { useRef, useEffect } from "react";
 import TypingTestTextBox from "./components/TypingTestTextBox";
+import TypingTestTimer from "./components/TypingTestTimer";
 import "./App.css";
 
 function App() {
   const words = ["test", "hello", "world", "testing", "typing"];
   const length = 10;
-  const tttbRef = useRef<HTMLDivElement>(null); // TypingTestTextBox ref
+  const textBoxRef = useRef<HTMLDivElement>(null); // TypingTestTextBox ref
 
   const handleKeyPress = (event: KeyboardEvent) => {
-    tttbRef.current!.focus();
+    textBoxRef.current!.focus();
   };
 
   useEffect(() => {
-    tttbRef.current!.focus();
+    textBoxRef.current!.focus();
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
@@ -20,7 +21,8 @@ function App() {
 
   return (
     <div id="global-box">
-      <TypingTestTextBox ref={tttbRef} words={words} wordsAmount={length} />
+      <TypingTestTimer />
+      <TypingTestTextBox ref={textBoxRef} words={words} wordsAmount={length} />
     </div>
   );
 }
