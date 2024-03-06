@@ -1,6 +1,7 @@
 import { useRef, useEffect } from "react";
 import TypingTestTextBox from "./components/TypingTestTextBox";
 import TypingTestTimer from "./components/TypingTestTimer";
+import TimeButton from "./components/TimeButton";
 import "./App.css";
 
 function App() {
@@ -21,6 +22,12 @@ function App() {
 
   return (
     <div id="global-box">
+      <div id="time-buttons">
+        <TimeButton time={1} timeUnit="min" />
+        <TimeButton time={3} timeUnit="min" />
+        <TimeButton time={5} timeUnit="min" />
+        <TimeButton time={10} timeUnit="min" />
+      </div>
       <TypingTestTimer />
       <TypingTestTextBox ref={textBoxRef} words={words} wordsAmount={length} />
     </div>
