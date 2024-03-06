@@ -8,7 +8,6 @@ function App() {
   const tttbRef = useRef<HTMLDivElement>(null); // TypingTestTextBox ref
 
   const handleKeyPress = (event: KeyboardEvent) => {
-    console.log(event);
     tttbRef.current!.focus();
   };
 

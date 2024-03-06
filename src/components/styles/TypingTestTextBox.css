@@ -1,3 +1,35 @@
+/* GLOBAL */
+.not-visible {
+  visibility: hidden;
+}
+
+
+/* CURSOR */
+
+@keyframes cursor-animation {
+  0% {border-color: rgba(0, 0, 0, 1);}
+  50% {border-color: rgba(0, 0, 0, 0);}
+  100% {border-color: rgba(0, 0, 0, 1);}
+}
+
+#cursor {
+  border-right: 1px solid;
+}
+
+.cursor-animation {
+  animation-name: cursor-animation;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-delay: 0s;
+}
+
+
+/* CHARACTER CONTAINERS */
+
+#typing-test-container:focus {
+  outline: 0px solid transparent;
+}
+
 .char-container {
   overflow: hidden;
   white-space: pre;
@@ -17,10 +49,10 @@
   width: 10em;
 }
 
-#cursor {
-  border-right: 1px black solid;
-}
-
 #untyped-chars {
   width: 10em;
+}
+
+#error-chars {
+  text-decoration-line: line-through;
 }

@@ -8,6 +8,8 @@ interface Props {
 
 const TypingTestTextBox = forwardRef<HTMLDivElement, Props>((props, ref) => {
   const { words, wordsAmount } = props; // Extract props
+  const cursorRef = useRef<HTMLDivElement>(null);
+  let lastInputTimeStamp = 0; // For cursor blinking animation
 
   // Generates the string used for the typing test
   const generateRandomWordListString = (words: string[]) => {
@@ -18,6 +20,15 @@ const TypingTestTextBox = forwardRef<HTMLDivElement, Props>((props, ref) => {
     }
     return wordListString.trim();
   };
+
+  // For cursor blinking animation
+  let [intervalLastInput, setIntervalLastInput] = useState(0);
+  // Strings containing the contents of the typing test text box
+  let [typedChars, setTypedChars] = useState("");
+  let [errorChars, setErrorChars] = useState("");
+  let [untypedChars, setUntypedChars] = useState(
+    generateRandomWordListString(words)
+  );
 
   const backspace = () => {
     if (errorChars.length > 0) {
@@ -50,7 +61,6 @@ const TypingTestTextBox = forwardRef<HTMLDivElement, Props>((props, ref) => {
       setErrorChars(errorChars.slice(0, errorIndex + 1));
 
       // Flag to specify so typedChars can also start being erased
-      console.log(errorIndex);
       if (errorIndex === -1) allErrorCharsErased = true;
     }
 
@@ -78,6 +88,8 @@ const TypingTestTextBox = forwardRef<HTMLDivElement, Props>((props, ref) => {
 
   // Handle key presses when typing test text box is focused
   const handleKeyPress = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    setIntervalLastInput(Date.now());
+
     const key = event.key;
 
     // Handle backspace
@@ -107,26 +119,62 @@ const TypingTestTextBox = forwardRef<HTMLDivElement, Props>((props, ref) => {
     }
   };
 
-  // Strings containing the contents of the typing test text box
-  let [typedChars, setTypedChars] = useState("");
-  let [errorChars, setErrorChars] = useState("");
-  let [untypedChars, setUntypedChars] = useState(
-    generateRandomWordListString(words)
-  );
+  // Shows cursor
+  const onFocus = () => {
+    cursorRef.current!.classList.remove("not-visible");
+  };
+
+  // Hides cursor
+  const onBlur = () => {
+    cursorRef.current!.classList.add("not-visible");
+  };
+
+  // Background tasks
+  useEffect(() => {
+    const backgroundHandleCursor = setInterval(() => {
+      const timeBeforeCursorAnim = 200; // In milliseconds
+      const cursor = cursorRef.current;
+
+      if (cursor === null) return;
+
+      // Check whether to add the flashing animation to the cursor or not
+      const elapsed = Date.now() - intervalLastInput;
+      if (elapsed < timeBeforeCursorAnim)
+        cursor.classList.remove("cursor-animation");
+      else if (cursor.classList.contains("cursor-animation") === false) {
+        cursor.classList.add("cursor-animation");
+
+        // Restart animation
+        cursor.style.animationName = "none";
+        requestAnimationFrame(() => {
+          cursor.style.animationName = "";
+        });
+      }
+    }, 10);
+
+    return () => {
+      clearInterval(backgroundHandleCursor);
+    };
+  }, [intervalLastInput]);
 
   return (
     <div
+      id="typing-test-container"
       className="d-flex"
       onKeyDown={(event) => handleKeyPress(event)}
       ref={ref}
       tabIndex={0}
+      onFocus={onFocus}
+      onBlur={onBlur}
     >
-      <div id="typed-chars" className="char-container text-primary">
-        {typedChars}
+      <div id="typed-chars" className="char-container">
+        <span className="text-primary">{typedChars}</span>
+        <span id="error-chars" className="text-danger">
+          {errorChars}
+        </span>
       </div>
-      <div id="cursor"></div>
+      <div id="cursor" ref={cursorRef}></div>
       <div id="untyped-chars" className="char-container">
-        <span className="text-danger">{errorChars}</span>
         <span className="text-dark">{untypedChars}</span>
       </div>
     </div>
