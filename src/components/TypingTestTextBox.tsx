@@ -4,10 +4,11 @@ import "./styles/TypingTestTextBox.css";
 interface Props {
   words: string[];
   wordsAmount: number;
+  onClick: Function;
 }
 
 const TypingTestTextBox = forwardRef<HTMLDivElement, Props>(
-  ({ words, wordsAmount }: Props, ref) => {
+  ({ words, wordsAmount, onClick }: Props, ref) => {
     const cursorRef = useRef<HTMLDivElement>(null);
     let lastInputTimeStamp = 0; // For cursor blinking animation
 
@@ -111,6 +112,7 @@ const TypingTestTextBox = forwardRef<HTMLDivElement, Props>(
         return;
 
       // Handle typed character
+      onClick(); // Emit typed char event to parent
       if (errorChars.length === 0 && key === untypedChars[0]) {
         setTypedChars(typedChars + untypedChars[0]);
         setUntypedChars(untypedChars.slice(1));

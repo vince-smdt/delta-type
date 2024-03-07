@@ -1,62 +1,41 @@
 import { useState, useEffect } from "react";
 import "./styles/TypingTestTimer.css";
+import customSetInterval from "../customSetInterval";
 
-enum TimerState {
-  READY,
-  IN_PROGRESS,
-  FINISHED,
+interface Props {
+  duration: number;
+  testStarted: boolean;
 }
 
-const TypingTestTimer = () => {
+const TypingTestTimer = ({ duration, testStarted }: Props) => {
   let [timeLeftStr, setTimeLeftStr] = useState("0:59");
   let [timerStartTime, setTimerStartTime] = useState(Date.now());
-  let [timerDuration, setTimerDuration] = useState(60); // Seconds
-  let [timerState, setTimerState] = useState(TimerState.IN_PROGRESS);
+  let [timerStarted, setTimerStarted] = useState(false);
 
   const getTimeLeft = () => {
-    if (timerState === TimerState.READY) return timerDuration;
-    if (timerState === TimerState.FINISHED) return 0;
+    if (testStarted === false) return duration;
 
     const elapsedSinceStart = (Date.now() - timerStartTime) / 1000; // In seconds
-    return Math.max(timerDuration - elapsedSinceStart, 0);
+    return Math.max(duration - elapsedSinceStart, 0);
   };
 
-  const reset = (duration: number) => {
-    setTimerState(TimerState.READY);
-    setTimerDuration(duration);
-  };
+  // Update timer display
+  customSetInterval(() => {
+    const timeLeft = getTimeLeft();
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = Math.floor(timeLeft % 60);
 
-  const start = () => {
-    setTimerStartTime(Date.now());
-    setTimerState(TimerState.IN_PROGRESS);
-  };
-
-  const pause = () => {
-    setTimerState(TimerState.READY);
-    setTimerDuration(getTimeLeft());
-  };
-
-  const getState = () => {
-    return timerState;
-  };
+    setTimeLeftStr(
+      minutes.toString() + ":" + seconds.toString().padStart(2, "0")
+    );
+  }, 10);
 
   useEffect(() => {
-    const updateTimerInterval = setInterval(() => {
-      const timeLeft = getTimeLeft();
-      const minutes = Math.floor(timeLeft / 60);
-      const seconds = Math.floor(timeLeft % 60);
-
-      if (timeLeft === 0) setTimerState(TimerState.FINISHED);
-
-      setTimeLeftStr(
-        minutes.toString() + ":" + seconds.toString().padStart(2, "0")
-      );
-    }, 10);
-
-    return () => {
-      clearInterval(updateTimerInterval);
-    };
-  }, []);
+    if (timerStarted === false && testStarted === true) {
+      setTimerStarted(true);
+      setTimerStartTime(Date.now());
+    }
+  }, [duration, testStarted]);
 
   return <div id="typing-test-timer">{timeLeftStr}</div>;
 };
