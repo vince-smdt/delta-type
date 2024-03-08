@@ -11,17 +11,23 @@ function App() {
   const words = ["test", "hello", "world", "testing", "typing"];
   const length = 10;
   const textBoxRef = useRef<HTMLDivElement>(null); // TypingTestTextBox ref
+  const timeButtonsRef = useRef<HTMLDivElement>(null);
 
   const handleKeyPress = (event: KeyboardEvent) => {
     textBoxRef.current!.focus();
   };
 
   const handleTypingTestKeyPress = () => {
-    setTestInProgress(true);
+    startTest();
   };
 
   const changeTestDuration = (durationInSeconds: number) => {
     setTestDuration(durationInSeconds);
+  };
+
+  const startTest = () => {
+    setTestInProgress(true);
+    timeButtonsRef.current!.classList.add("display-none");
   };
 
   useEffect(() => {
@@ -33,7 +39,7 @@ function App() {
 
   return (
     <div id="global-box">
-      <div id="time-buttons">
+      <div ref={timeButtonsRef} id="time-buttons">
         <TimeButton time={1} timeUnit="min" onClick={changeTestDuration} />
         <TimeButton time={3} timeUnit="min" onClick={changeTestDuration} />
         <TimeButton time={5} timeUnit="min" onClick={changeTestDuration} />

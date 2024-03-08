@@ -8,7 +8,7 @@ interface Props {
 }
 
 const TypingTestTimer = ({ duration, testStarted }: Props) => {
-  let [timeLeftStr, setTimeLeftStr] = useState("0:59");
+  let [timeLeftStr, setTimeLeftStr] = useState("0:00");
   let [timerStartTime, setTimerStartTime] = useState(Date.now());
   let [timerStarted, setTimerStarted] = useState(false);
 
