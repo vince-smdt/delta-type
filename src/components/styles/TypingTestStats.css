@@ -1,0 +1,22 @@
+#typing-test-stats {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+}
+
+.stat-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.stat-value {
+  font-size: 40px;
+  line-height: 1em;
+}
+
+.stat-name {
+  font-size: 15px;
+}
