@@ -9,6 +9,7 @@ function App() {
   let [testDuration, setTestDuration] = useState(60);
   let [testStartTime, setTestStartTime] = useState(Date.now());
   let [testInProgress, setTestInProgress] = useState(false);
+  let [testFinished, setTestFinished] = useState(false);
   let [testWPM, setTestWPM] = useState(0);
   let [testCharsTyped, setTestCharsTyped] = useState(0);
   let [testAccuracy, setTestAccuracy] = useState(0);
@@ -47,6 +48,11 @@ function App() {
     statsRef.current!.classList.remove("display-none");
   };
 
+  const stopTest = () => {
+    setTestInProgress(false);
+    setTestFinished(true);
+  };
+
   useEffect(() => {
     // Auto-focus typing test text box
     textBoxRef.current!.focus();
@@ -62,10 +68,11 @@ function App() {
   return (
     <div id="global-box">
       <div ref={timeButtonsRef} id="time-buttons">
+        <TimeButton time={10} timeUnit="sec" onClick={changeTestDuration} />
+        <TimeButton time={30} timeUnit="sec" onClick={changeTestDuration} />
         <TimeButton time={1} timeUnit="min" onClick={changeTestDuration} />
         <TimeButton time={3} timeUnit="min" onClick={changeTestDuration} />
         <TimeButton time={5} timeUnit="min" onClick={changeTestDuration} />
-        <TimeButton time={10} timeUnit="min" onClick={changeTestDuration} />
       </div>
       <TypingTestStats
         ref={statsRef}
@@ -77,13 +84,16 @@ function App() {
         duration={testDuration}
         testStarted={testInProgress}
         startTime={testStartTime}
+        onFinish={stopTest}
       />
-      <TypingTestTextBox
-        ref={textBoxRef}
-        words={words}
-        wordsAmount={length}
-        onKeyPress={handleTypingTestKeyPress}
-      />
+      {!testFinished && (
+        <TypingTestTextBox
+          ref={textBoxRef}
+          words={words}
+          wordsAmount={length}
+          onKeyPress={handleTypingTestKeyPress}
+        />
+      )}
     </div>
   );
 }

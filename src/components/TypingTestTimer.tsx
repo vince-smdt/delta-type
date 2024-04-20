@@ -6,9 +6,15 @@ interface Props {
   duration: number;
   testStarted: boolean;
   startTime: number;
+  onFinish: Function;
 }
 
-const TypingTestTimer = ({ duration, testStarted, startTime }: Props) => {
+const TypingTestTimer = ({
+  duration,
+  testStarted,
+  startTime,
+  onFinish,
+}: Props) => {
   let [timeLeftStr, setTimeLeftStr] = useState("0:00");
 
   const getTimeLeft = () => {
@@ -27,6 +33,8 @@ const TypingTestTimer = ({ duration, testStarted, startTime }: Props) => {
     setTimeLeftStr(
       minutes.toString() + ":" + seconds.toString().padStart(2, "0")
     );
+
+    if (timeLeft === 0) onFinish();
   }, 10);
 
   return <div id="typing-test-timer">{timeLeftStr}</div>;
