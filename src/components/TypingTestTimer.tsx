@@ -5,17 +5,16 @@ import customSetInterval from "../customSetInterval";
 interface Props {
   duration: number;
   testStarted: boolean;
+  startTime: number;
 }
 
-const TypingTestTimer = ({ duration, testStarted }: Props) => {
+const TypingTestTimer = ({ duration, testStarted, startTime }: Props) => {
   let [timeLeftStr, setTimeLeftStr] = useState("0:00");
-  let [timerStartTime, setTimerStartTime] = useState(Date.now());
-  let [timerStarted, setTimerStarted] = useState(false);
 
   const getTimeLeft = () => {
     if (testStarted === false) return duration;
 
-    const elapsedSinceStart = (Date.now() - timerStartTime) / 1000; // In seconds
+    const elapsedSinceStart = (Date.now() - startTime) / 1000; // In seconds
     return Math.max(duration - elapsedSinceStart, 0);
   };
 
@@ -29,13 +28,6 @@ const TypingTestTimer = ({ duration, testStarted }: Props) => {
       minutes.toString() + ":" + seconds.toString().padStart(2, "0")
     );
   }, 10);
-
-  useEffect(() => {
-    if (timerStarted === false && testStarted === true) {
-      setTimerStarted(true);
-      setTimerStartTime(Date.now());
-    }
-  }, [duration, testStarted]);
 
   return <div id="typing-test-timer">{timeLeftStr}</div>;
 };

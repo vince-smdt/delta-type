@@ -7,6 +7,7 @@ import "./App.css";
 
 function App() {
   let [testDuration, setTestDuration] = useState(60);
+  let [testStartTime, setTestStartTime] = useState(Date.now());
   let [testInProgress, setTestInProgress] = useState(false);
   let [testWPM, setTestWPM] = useState(0);
   let [testCharsTyped, setTestCharsTyped] = useState(0);
@@ -28,7 +29,9 @@ function App() {
     accuracy: number
   ) => {
     if (testInProgress === false) startTest();
-    setTestWPM(wordsTyped);
+    let testSecondsElapsed = (Date.now() - testStartTime) / 1000;
+    let wpm = Math.round((wordsTyped * 60) / testSecondsElapsed);
+    setTestWPM(wpm);
     setTestCharsTyped(charsTyped);
     setTestAccuracy(accuracy);
   };
@@ -39,6 +42,7 @@ function App() {
 
   const startTest = () => {
     setTestInProgress(true);
+    setTestStartTime(Date.now());
     timeButtonsRef.current!.classList.add("display-none");
     statsRef.current!.classList.remove("display-none");
   };
@@ -69,7 +73,11 @@ function App() {
         charsTyped={testCharsTyped}
         accuracy={testAccuracy}
       />
-      <TypingTestTimer duration={testDuration} testStarted={testInProgress} />
+      <TypingTestTimer
+        duration={testDuration}
+        testStarted={testInProgress}
+        startTime={testStartTime}
+      />
       <TypingTestTextBox
         ref={textBoxRef}
         words={words}
