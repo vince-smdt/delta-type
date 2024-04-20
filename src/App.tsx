@@ -8,9 +8,12 @@ import "./App.css";
 function App() {
   let [testDuration, setTestDuration] = useState(60);
   let [testInProgress, setTestInProgress] = useState(false);
+  let [testWPM, setTestWPM] = useState(0);
+  let [testCharsTyped, setTestCharsTyped] = useState(0);
+  let [testAccuracy, setTestAccuracy] = useState(0);
 
   const words = ["test", "hello", "world", "testing", "typing"];
-  const length = 10;
+  const length = 10000;
   const textBoxRef = useRef<HTMLDivElement>(null); // TypingTestTextBox ref
   const timeButtonsRef = useRef<HTMLDivElement>(null); // TimeButton ref
   const statsRef = useRef<HTMLDivElement>(null); // TypingTestStats ref
@@ -19,8 +22,15 @@ function App() {
     textBoxRef.current!.focus();
   };
 
-  const handleTypingTestKeyPress = () => {
-    startTest();
+  const handleTypingTestKeyPress = (
+    wordsTyped: number,
+    charsTyped: number,
+    accuracy: number
+  ) => {
+    if (testInProgress === false) startTest();
+    setTestWPM(wordsTyped);
+    setTestCharsTyped(charsTyped);
+    setTestAccuracy(accuracy);
   };
 
   const changeTestDuration = (durationInSeconds: number) => {
@@ -53,13 +63,18 @@ function App() {
         <TimeButton time={5} timeUnit="min" onClick={changeTestDuration} />
         <TimeButton time={10} timeUnit="min" onClick={changeTestDuration} />
       </div>
-      <TypingTestStats ref={statsRef} />
+      <TypingTestStats
+        ref={statsRef}
+        wpm={testWPM}
+        charsTyped={testCharsTyped}
+        accuracy={testAccuracy}
+      />
       <TypingTestTimer duration={testDuration} testStarted={testInProgress} />
       <TypingTestTextBox
         ref={textBoxRef}
         words={words}
         wordsAmount={length}
-        onClick={handleTypingTestKeyPress}
+        onKeyPress={handleTypingTestKeyPress}
       />
     </div>
   );

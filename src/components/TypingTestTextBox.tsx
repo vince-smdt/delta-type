@@ -4,14 +4,12 @@ import "./styles/TypingTestTextBox.css";
 interface Props {
   words: string[];
   wordsAmount: number;
-  onClick: Function;
+  onKeyPress: Function;
 }
 
 const TypingTestTextBox = forwardRef<HTMLDivElement, Props>(
-  ({ words, wordsAmount, onClick }: Props, ref) => {
+  ({ words, wordsAmount, onKeyPress }: Props, ref) => {
     const cursorRef = useRef<HTMLDivElement>(null);
-    let lastInputTimeStamp = 0; // For cursor blinking animation
-
     // Generates the string used for the typing test
     const generateRandomWordListString = (words: string[]) => {
       let wordListString = "";
@@ -30,20 +28,25 @@ const TypingTestTextBox = forwardRef<HTMLDivElement, Props>(
     let [untypedChars, setUntypedChars] = useState(
       generateRandomWordListString(words)
     );
+    let [errorAmount, setErrorAmount] = useState(0);
 
     const backspace = () => {
+      let syncedTypedChars = typedChars;
       if (errorChars.length > 0) {
         setErrorChars(errorChars.slice(0, -1));
       } else if (typedChars.length > 0) {
         setUntypedChars(typedChars[typedChars.length - 1] + untypedChars);
-        setTypedChars(typedChars.slice(0, -1));
+        syncedTypedChars = typedChars.slice(0, -1);
+        setTypedChars(syncedTypedChars);
       }
+      keyPressCallBack(syncedTypedChars, errorAmount);
     };
 
     const ctrlBackspace = () => {
       let allErrorCharsErased = false;
       let charCondition = (str: string, index: number) => false;
       let charConditionSet = false;
+      let syncedTypedChars = typedChars;
 
       // Handle errorChars
       if (errorChars.length > 0) {
@@ -83,8 +86,10 @@ const TypingTestTextBox = forwardRef<HTMLDivElement, Props>(
         while (charCondition(typedChars, typedIndex) && typedIndex >= 0)
           typedIndex--;
         setUntypedChars(typedChars.slice(typedIndex + 1) + untypedChars);
-        setTypedChars(typedChars.slice(0, typedIndex + 1));
+        syncedTypedChars = typedChars.slice(0, typedIndex + 1);
+        setTypedChars(syncedTypedChars);
       }
+      keyPressCallBack(syncedTypedChars, errorAmount);
     };
 
     // Handle key presses when typing test text box is focused
@@ -112,13 +117,30 @@ const TypingTestTextBox = forwardRef<HTMLDivElement, Props>(
         return;
 
       // Handle typed character
-      onClick(); // Emit typed char event to parent
+      let syncedTypedChars = typedChars + untypedChars[0];
+      let syncedErrorAmount = errorAmount;
       if (errorChars.length === 0 && key === untypedChars[0]) {
-        setTypedChars(typedChars + untypedChars[0]);
+        setTypedChars(syncedTypedChars);
         setUntypedChars(untypedChars.slice(1));
       } else {
         setErrorChars(errorChars + key);
+        syncedErrorAmount++;
+        setErrorAmount(syncedErrorAmount);
       }
+      keyPressCallBack(syncedTypedChars, syncedErrorAmount);
+    };
+
+    // Calls parent keypress callback function, generates necessary info
+    const keyPressCallBack = (typed: string, errors: number) => {
+      let wordsTypedAmount = typed.split(" ").length - 1;
+      let charsTypedAmount = typed.length;
+      let totalCharsTypedAmount = charsTypedAmount + errors;
+      let accuracy =
+        totalCharsTypedAmount === 0
+          ? 0
+          : Math.round((charsTypedAmount / totalCharsTypedAmount) * 100);
+
+      onKeyPress(wordsTypedAmount, charsTypedAmount, accuracy);
     };
 
     // Shows cursor
