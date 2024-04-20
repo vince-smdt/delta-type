@@ -4,6 +4,8 @@ import TimeButton from "./components/TimeButton";
 import TypingTestStats from "./components/TypingTestStats";
 import TypingTestTextBox from "./components/TypingTestTextBox";
 import TypingTestTimer from "./components/TypingTestTimer";
+import _100mostCommonEnglishWords from "./data/100mostCommonEnglishWords";
+import _1000mostCommonEnglishWords from "./data/100mostCommonEnglishWords";
 import "./App.css";
 
 function App() {
@@ -15,12 +17,12 @@ function App() {
   let [testCharsTyped, setTestCharsTyped] = useState(0);
   let [testAccuracy, setTestAccuracy] = useState(0);
 
-  const words = ["test", "hello", "world", "testing", "typing"];
+  const words = _1000mostCommonEnglishWords;
   const length = 10000;
   const textBoxRef = useRef<HTMLDivElement>(null); // TypingTestTextBox ref
 
   const handleKeyPress = (event: KeyboardEvent) => {
-    textBoxRef.current!.focus();
+    textBoxRef.current?.focus();
   };
 
   const handleTypingTestKeyPress = (
