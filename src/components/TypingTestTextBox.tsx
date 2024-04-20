@@ -4,11 +4,16 @@ import "./styles/TypingTestTextBox.css";
 interface Props {
   words: string[];
   wordsAmount: number;
+  testInProgress: boolean;
+  testFinished: boolean;
   onKeyPress: Function;
 }
 
 const TypingTestTextBox = forwardRef<HTMLDivElement, Props>(
-  ({ words, wordsAmount, onKeyPress }: Props, ref) => {
+  (
+    { words, wordsAmount, testInProgress, testFinished, onKeyPress }: Props,
+    ref
+  ) => {
     const cursorRef = useRef<HTMLDivElement>(null);
     // Generates the string used for the typing test
     const generateRandomWordListString = (words: string[]) => {
@@ -153,7 +158,7 @@ const TypingTestTextBox = forwardRef<HTMLDivElement, Props>(
       cursorRef.current!.classList.add("not-visible");
     };
 
-    // Background tasks
+    // Cursor handler
     useEffect(() => {
       const backgroundHandleCursor = setInterval(() => {
         const timeBeforeCursorAnim = 200; // In milliseconds
@@ -180,6 +185,15 @@ const TypingTestTextBox = forwardRef<HTMLDivElement, Props>(
         clearInterval(backgroundHandleCursor);
       };
     }, [intervalLastInput]);
+
+    // Restart handler
+    useEffect(() => {
+      if (!testInProgress && !testFinished) {
+        setUntypedChars(generateRandomWordListString(words));
+        setTypedChars("");
+        setErrorChars("");
+      }
+    }, [testInProgress, testFinished]);
 
     return (
       <div
