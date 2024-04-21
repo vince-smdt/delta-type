@@ -20,3 +20,11 @@
 .stat-name {
   font-size: 15px;
 }
+
+.bigger-stats.stat-value {
+  font-size: 60px !important;
+}
+
+.bigger-stats.stat-name {
+  font-size: 30px !important;
+}

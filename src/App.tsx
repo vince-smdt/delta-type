@@ -31,14 +31,10 @@ function App() {
     }
   };
 
-  const handleTypingTestKeyPress = (
-    wordsTyped: number,
-    charsTyped: number,
-    accuracy: number
-  ) => {
+  const handleTypingTestKeyPress = (charsTyped: number, accuracy: number) => {
     if (testInProgress === false) startTest();
-    let testSecondsElapsed = (Date.now() - testStartTime) / 1000;
-    let wpm = Math.round((wordsTyped * 60) / testSecondsElapsed);
+    let testMinutesElapsed = (Date.now() - testStartTime) / 60000;
+    let wpm = Math.round(charsTyped / (6 * testMinutesElapsed));
     setTestWPM(wpm);
     setTestCharsTyped(charsTyped);
     setTestAccuracy(accuracy);
@@ -96,14 +92,17 @@ function App() {
             wpm={testWPM}
             charsTyped={testCharsTyped}
             accuracy={testAccuracy}
+            testFinished={testFinished}
           />
         )}
-        <TypingTestTimer
-          duration={testDuration}
-          testStarted={testInProgress}
-          startTime={testStartTime}
-          onFinish={stopTest}
-        />
+        {!testFinished && (
+          <TypingTestTimer
+            duration={testDuration}
+            testStarted={testInProgress}
+            startTime={testStartTime}
+            onFinish={stopTest}
+          />
+        )}
         {!testFinished && (
           <TypingTestTextBox
             ref={textBoxRef}

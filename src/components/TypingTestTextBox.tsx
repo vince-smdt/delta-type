@@ -137,7 +137,6 @@ const TypingTestTextBox = forwardRef<HTMLDivElement, Props>(
 
     // Calls parent keypress callback function, generates necessary info
     const keyPressCallBack = (typed: string, errors: number) => {
-      let wordsTypedAmount = typed.split(" ").length - 1;
       let charsTypedAmount = typed.length;
       let totalCharsTypedAmount = charsTypedAmount + errors;
       let accuracy =
@@ -145,7 +144,7 @@ const TypingTestTextBox = forwardRef<HTMLDivElement, Props>(
           ? 0
           : Math.round((charsTypedAmount / totalCharsTypedAmount) * 100);
 
-      onKeyPress(wordsTypedAmount, charsTypedAmount, accuracy);
+      onKeyPress(charsTypedAmount, accuracy);
     };
 
     // Shows cursor
