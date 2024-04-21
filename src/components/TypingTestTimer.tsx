@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "./styles/TypingTestTimer.css";
 import customSetInterval from "../customSetInterval";
 
@@ -16,6 +16,7 @@ const TypingTestTimer = ({
   onFinish,
 }: Props) => {
   let [timeLeftStr, setTimeLeftStr] = useState("0:00");
+  let [timerRung, setTimerRung] = useState(false);
 
   const getTimeLeft = () => {
     if (testStarted === false) return duration;
@@ -34,7 +35,12 @@ const TypingTestTimer = ({
       minutes.toString() + ":" + seconds.toString().padStart(2, "0")
     );
 
-    if (timeLeft === 0) onFinish();
+    if (timeLeft === 0) {
+      if (!timerRung) {
+        onFinish();
+        setTimerRung(true);
+      }
+    } else setTimerRung(false);
   }, 10);
 
   return <div id="typing-test-timer">{timeLeftStr}</div>;

@@ -14,6 +14,7 @@ function App() {
   let [testDuration, setTestDuration] = useState(60);
   let [testStartTime, setTestStartTime] = useState(Date.now());
   let [testInProgress, setTestInProgress] = useState(false);
+  let [testFinishedSignal, setTestFinishedSignal] = useState(false);
   let [testFinished, setTestFinished] = useState(false);
   let [testWPM, setTestWPM] = useState(0);
   let [testCharsTyped, setTestCharsTyped] = useState(0);
@@ -22,6 +23,14 @@ function App() {
   const words = _1000mostCommonEnglishWords;
   const length = 10000;
   const textBoxRef = useRef<HTMLDivElement>(null); // TypingTestTextBox ref
+
+  const updateStats = (charsTyped: number, accuracy: number) => {
+    let testMinutesElapsed = (Date.now() - testStartTime) / 60000;
+    let wpm = Math.round(charsTyped / (6 * testMinutesElapsed));
+    setTestWPM(wpm);
+    setTestCharsTyped(charsTyped);
+    setTestAccuracy(accuracy);
+  };
 
   const handleKeyPress = (event: KeyboardEvent) => {
     textBoxRef.current?.focus();
@@ -33,11 +42,7 @@ function App() {
 
   const handleTypingTestKeyPress = (charsTyped: number, accuracy: number) => {
     if (testInProgress === false) startTest();
-    let testMinutesElapsed = (Date.now() - testStartTime) / 60000;
-    let wpm = Math.round(charsTyped / (6 * testMinutesElapsed));
-    setTestWPM(wpm);
-    setTestCharsTyped(charsTyped);
-    setTestAccuracy(accuracy);
+    updateStats(charsTyped, accuracy);
   };
 
   const changeTestDuration = (durationInSeconds: number) => {
@@ -52,14 +57,22 @@ function App() {
     setTestStartTime(Date.now());
   };
 
+  const prepareStopTest = () => {
+    setTestFinishedSignal(true);
+  };
+
   const stopTest = () => {
     setTestInProgress(false);
+    setTestFinishedSignal(false);
     setTestFinished(true);
   };
 
   const restartTest = () => {
     setTestInProgress(false);
     setTestFinished(false);
+
+    // Auto-focus typing test text box
+    textBoxRef.current?.focus();
   };
 
   useEffect(() => {
@@ -102,7 +115,7 @@ function App() {
             duration={testDuration}
             testStarted={testInProgress}
             startTime={testStartTime}
-            onFinish={stopTest}
+            onFinish={prepareStopTest}
           />
         )}
         {!testFinished && (
@@ -111,8 +124,10 @@ function App() {
             words={words}
             wordsAmount={length}
             testInProgress={testInProgress}
+            testFinishedSignal={testFinishedSignal}
             testFinished={testFinished}
             onKeyPress={handleTypingTestKeyPress}
+            onTestFinishedSignal={stopTest}
           />
         )}
         <RestartButton onClick={restartTest} />

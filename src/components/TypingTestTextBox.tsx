@@ -5,13 +5,23 @@ interface Props {
   words: string[];
   wordsAmount: number;
   testInProgress: boolean;
+  testFinishedSignal: boolean;
   testFinished: boolean;
   onKeyPress: Function;
+  onTestFinishedSignal: Function;
 }
 
 const TypingTestTextBox = forwardRef<HTMLDivElement, Props>(
   (
-    { words, wordsAmount, testInProgress, testFinished, onKeyPress }: Props,
+    {
+      words,
+      wordsAmount,
+      testInProgress,
+      testFinishedSignal,
+      testFinished,
+      onKeyPress,
+      onTestFinishedSignal,
+    }: Props,
     ref
   ) => {
     const cursorRef = useRef<HTMLDivElement>(null);
@@ -44,7 +54,7 @@ const TypingTestTextBox = forwardRef<HTMLDivElement, Props>(
         syncedTypedChars = typedChars.slice(0, -1);
         setTypedChars(syncedTypedChars);
       }
-      keyPressCallBack(syncedTypedChars, errorAmount);
+      updateStats(syncedTypedChars, errorAmount);
     };
 
     const ctrlBackspace = () => {
@@ -94,7 +104,7 @@ const TypingTestTextBox = forwardRef<HTMLDivElement, Props>(
         syncedTypedChars = typedChars.slice(0, typedIndex + 1);
         setTypedChars(syncedTypedChars);
       }
-      keyPressCallBack(syncedTypedChars, errorAmount);
+      updateStats(syncedTypedChars, errorAmount);
     };
 
     // Handle key presses when typing test text box is focused
@@ -132,11 +142,11 @@ const TypingTestTextBox = forwardRef<HTMLDivElement, Props>(
         syncedErrorAmount++;
         setErrorAmount(syncedErrorAmount);
       }
-      keyPressCallBack(syncedTypedChars, syncedErrorAmount);
+      updateStats(syncedTypedChars, syncedErrorAmount);
     };
 
     // Calls parent keypress callback function, generates necessary info
-    const keyPressCallBack = (typed: string, errors: number) => {
+    const updateStats = (typed: string, errors: number) => {
       let charsTypedAmount = typed.length;
       let totalCharsTypedAmount = charsTypedAmount + errors;
       let accuracy =
@@ -193,6 +203,13 @@ const TypingTestTextBox = forwardRef<HTMLDivElement, Props>(
         setErrorChars("");
       }
     }, [testInProgress, testFinished]);
+
+    useEffect(() => {
+      if (testFinishedSignal) {
+        updateStats(typedChars, errorAmount);
+        onTestFinishedSignal();
+      }
+    }, [testFinishedSignal]);
 
     return (
       <div
