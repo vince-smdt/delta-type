@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import Header from "./components/Header";
 import RestartButton from "./components/RestartButton";
 import TimeButton from "./components/TimeButton";
 import TypingTestStats from "./components/TypingTestStats";
@@ -40,6 +41,9 @@ function App() {
 
   const changeTestDuration = (durationInSeconds: number) => {
     setTestDuration(durationInSeconds);
+
+    // Auto-focus typing test text box
+    textBoxRef.current?.focus();
   };
 
   const startTest = () => {
@@ -55,11 +59,14 @@ function App() {
   const restartTest = () => {
     setTestInProgress(false);
     setTestFinished(false);
+
+    // Auto-focus typing test text box
+    textBoxRef.current?.focus();
   };
 
   useEffect(() => {
     // Auto-focus typing test text box
-    textBoxRef.current!.focus();
+    textBoxRef.current?.focus();
 
     // Every key press auto-focuses on the text box
     window.addEventListener("keydown", handleKeyPress);
@@ -67,40 +74,43 @@ function App() {
   }, []);
 
   return (
-    <div id="global-box">
-      {!testInProgress && !testFinished && (
-        <div id="time-buttons">
-          <TimeButton time={10} timeUnit="sec" onClick={changeTestDuration} />
-          <TimeButton time={30} timeUnit="sec" onClick={changeTestDuration} />
-          <TimeButton time={1} timeUnit="min" onClick={changeTestDuration} />
-          <TimeButton time={3} timeUnit="min" onClick={changeTestDuration} />
-          <TimeButton time={5} timeUnit="min" onClick={changeTestDuration} />
-        </div>
-      )}
-      {(testInProgress || testFinished) && (
-        <TypingTestStats
-          wpm={testWPM}
-          charsTyped={testCharsTyped}
-          accuracy={testAccuracy}
+    <div>
+      <Header />
+      <div id="global-box">
+        {!testInProgress && !testFinished && (
+          <div id="time-buttons">
+            <TimeButton time={10} timeUnit="sec" onClick={changeTestDuration} />
+            <TimeButton time={30} timeUnit="sec" onClick={changeTestDuration} />
+            <TimeButton time={1} timeUnit="min" onClick={changeTestDuration} />
+            <TimeButton time={3} timeUnit="min" onClick={changeTestDuration} />
+            <TimeButton time={5} timeUnit="min" onClick={changeTestDuration} />
+          </div>
+        )}
+        {(testInProgress || testFinished) && (
+          <TypingTestStats
+            wpm={testWPM}
+            charsTyped={testCharsTyped}
+            accuracy={testAccuracy}
+          />
+        )}
+        <TypingTestTimer
+          duration={testDuration}
+          testStarted={testInProgress}
+          startTime={testStartTime}
+          onFinish={stopTest}
         />
-      )}
-      <TypingTestTimer
-        duration={testDuration}
-        testStarted={testInProgress}
-        startTime={testStartTime}
-        onFinish={stopTest}
-      />
-      {!testFinished && (
-        <TypingTestTextBox
-          ref={textBoxRef}
-          words={words}
-          wordsAmount={length}
-          testInProgress={testInProgress}
-          testFinished={testFinished}
-          onKeyPress={handleTypingTestKeyPress}
-        />
-      )}
-      <RestartButton onClick={restartTest} />
+        {!testFinished && (
+          <TypingTestTextBox
+            ref={textBoxRef}
+            words={words}
+            wordsAmount={length}
+            testInProgress={testInProgress}
+            testFinished={testFinished}
+            onKeyPress={handleTypingTestKeyPress}
+          />
+        )}
+        <RestartButton onClick={restartTest} />
+      </div>
     </div>
   );
 }
