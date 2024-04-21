@@ -60,9 +60,6 @@ function App() {
   const restartTest = () => {
     setTestInProgress(false);
     setTestFinished(false);
-
-    // Auto-focus typing test text box
-    textBoxRef.current?.focus();
   };
 
   useEffect(() => {
@@ -73,6 +70,11 @@ function App() {
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, []);
+
+  useEffect(() => {
+    // Auto-focus typing test text box
+    textBoxRef.current?.focus();
+  }, [testFinished]);
 
   return (
     <div>
