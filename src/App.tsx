@@ -20,6 +20,8 @@ function App() {
   let [testCharsTyped, setTestCharsTyped] = useState(0);
   let [testAccuracy, setTestAccuracy] = useState(0);
 
+  let [selectedTimeButtonId, setSelectedTimeButtonId] = useState(2);
+
   const words = _1000mostCommonEnglishWords;
   const length = 10000;
   const textBoxRef = useRef<HTMLDivElement>(null); // TypingTestTextBox ref
@@ -45,8 +47,9 @@ function App() {
     updateStats(charsTyped, accuracy);
   };
 
-  const changeTestDuration = (durationInSeconds: number) => {
+  const changeTestDuration = (durationInSeconds: number, buttonId: number) => {
     setTestDuration(durationInSeconds);
+    setSelectedTimeButtonId(buttonId);
 
     // Auto-focus typing test text box
     textBoxRef.current?.focus();
@@ -95,11 +98,41 @@ function App() {
       <div id="global-box">
         {!testInProgress && !testFinished && (
           <div id="time-buttons">
-            <TimeButton time={10} timeUnit="sec" onClick={changeTestDuration} />
-            <TimeButton time={30} timeUnit="sec" onClick={changeTestDuration} />
-            <TimeButton time={1} timeUnit="min" onClick={changeTestDuration} />
-            <TimeButton time={3} timeUnit="min" onClick={changeTestDuration} />
-            <TimeButton time={5} timeUnit="min" onClick={changeTestDuration} />
+            <TimeButton
+              time={10}
+              timeUnit="sec"
+              id={0}
+              selectedId={selectedTimeButtonId}
+              onClick={changeTestDuration}
+            />
+            <TimeButton
+              time={30}
+              timeUnit="sec"
+              id={1}
+              selectedId={selectedTimeButtonId}
+              onClick={changeTestDuration}
+            />
+            <TimeButton
+              time={1}
+              timeUnit="min"
+              id={2}
+              selectedId={selectedTimeButtonId}
+              onClick={changeTestDuration}
+            />
+            <TimeButton
+              time={3}
+              timeUnit="min"
+              id={3}
+              selectedId={selectedTimeButtonId}
+              onClick={changeTestDuration}
+            />
+            <TimeButton
+              time={5}
+              timeUnit="min"
+              id={4}
+              selectedId={selectedTimeButtonId}
+              onClick={changeTestDuration}
+            />
           </div>
         )}
         {(testInProgress || testFinished) && (

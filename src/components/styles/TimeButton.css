@@ -14,6 +14,14 @@
   user-select: none;
 }
 
+.time-button:hover {
+  background-color: rgb(230, 255, 255);
+}
+
+.time-button.selected {
+  background-color: rgb(190, 255, 255);
+}
+
 .time-button div:nth-child(1) {
   font-size: 40px;
   line-height: 1em;
