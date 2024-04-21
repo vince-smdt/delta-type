@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import Footer from "./components/Footer";
 import Header from "./components/Header";
 import RestartButton from "./components/RestartButton";
 import TimeButton from "./components/TimeButton";
@@ -24,6 +25,10 @@ function App() {
 
   const handleKeyPress = (event: KeyboardEvent) => {
     textBoxRef.current?.focus();
+
+    if (event.key === " ") {
+      event.preventDefault();
+    }
   };
 
   const handleTypingTestKeyPress = (
@@ -111,6 +116,7 @@ function App() {
         )}
         <RestartButton onClick={restartTest} />
       </div>
+      <Footer />
     </div>
   );
 }
