@@ -13,3 +13,7 @@
   text-decoration: none;
   color: black;
 }
+
+#header svg {
+  margin: -0.1em 0 0 -0.4em;
+}
