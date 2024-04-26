@@ -11,15 +11,20 @@ import _1000mostCommonEnglishWords from "./data/100mostCommonEnglishWords";
 import "./App.css";
 
 function App() {
+  // Test info & states
   let [testDuration, setTestDuration] = useState(60);
   let [testStartTime, setTestStartTime] = useState(Date.now());
   let [testInProgress, setTestInProgress] = useState(false);
-  let [testFinishedSignal, setTestFinishedSignal] = useState(false);
   let [testFinished, setTestFinished] = useState(false);
   let [testWPM, setTestWPM] = useState(0);
   let [testCharsTyped, setTestCharsTyped] = useState(0);
   let [testAccuracy, setTestAccuracy] = useState(0);
 
+  // Signals
+  let [updateStatsSignal, setUpdateStatsSignal] = useState(false);
+  let [regenerateTestSignal, setRegenerateTestSignal] = useState(false);
+
+  // Selected options
   let [selectedTimeButtonId, setSelectedTimeButtonId] = useState(2);
 
   const words = _1000mostCommonEnglishWords;
@@ -42,8 +47,12 @@ function App() {
     }
   };
 
-  const handleTypingTestKeyPress = (charsTyped: number, accuracy: number) => {
-    if (testInProgress === false) startTest();
+  const handleTypingTestKeyPress = (
+    charsTyped: number,
+    accuracy: number,
+    startTestCondition: boolean
+  ) => {
+    if (!testInProgress && startTestCondition) startTest();
     updateStats(charsTyped, accuracy);
   };
 
@@ -60,17 +69,14 @@ function App() {
     setTestStartTime(Date.now());
   };
 
-  const prepareStopTest = () => {
-    setTestFinishedSignal(true);
-  };
-
   const stopTest = () => {
+    setUpdateStatsSignal(!updateStatsSignal);
     setTestInProgress(false);
-    setTestFinishedSignal(false);
     setTestFinished(true);
   };
 
   const restartTest = () => {
+    setRegenerateTestSignal(!regenerateTestSignal);
     setTestInProgress(false);
     setTestFinished(false);
 
@@ -148,21 +154,18 @@ function App() {
             duration={testDuration}
             testStarted={testInProgress}
             startTime={testStartTime}
-            onFinish={prepareStopTest}
+            onFinish={stopTest}
           />
         )}
-        {!testFinished && (
-          <TypingTestTextBox
-            ref={textBoxRef}
-            words={words}
-            wordsAmount={length}
-            testInProgress={testInProgress}
-            testFinishedSignal={testFinishedSignal}
-            testFinished={testFinished}
-            onKeyPress={handleTypingTestKeyPress}
-            onTestFinishedSignal={stopTest}
-          />
-        )}
+        <TypingTestTextBox
+          ref={textBoxRef}
+          words={words}
+          wordsAmount={length}
+          updateStatsSignal={updateStatsSignal}
+          regenerateTestSignal={regenerateTestSignal}
+          hidden={testFinished}
+          onKeyPress={handleTypingTestKeyPress}
+        />
         <RestartButton onClick={restartTest} />
       </div>
       <Footer />

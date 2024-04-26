@@ -4,11 +4,10 @@ import "./styles/TypingTestTextBox.css";
 interface Props {
   words: string[];
   wordsAmount: number;
-  testInProgress: boolean;
-  testFinishedSignal: boolean;
-  testFinished: boolean;
+  updateStatsSignal: boolean;
+  regenerateTestSignal: boolean;
+  hidden: boolean;
   onKeyPress: Function;
-  onTestFinishedSignal: Function;
 }
 
 const TypingTestTextBox = forwardRef<HTMLDivElement, Props>(
@@ -16,11 +15,10 @@ const TypingTestTextBox = forwardRef<HTMLDivElement, Props>(
     {
       words,
       wordsAmount,
-      testInProgress,
-      testFinishedSignal,
-      testFinished,
+      updateStatsSignal,
+      regenerateTestSignal,
+      hidden,
       onKeyPress,
-      onTestFinishedSignal,
     }: Props,
     ref
   ) => {
@@ -146,7 +144,11 @@ const TypingTestTextBox = forwardRef<HTMLDivElement, Props>(
     };
 
     // Calls parent keypress callback function, generates necessary info
-    const updateStats = (typed: string, errors: number) => {
+    const updateStats = (
+      typed: string,
+      errors: number,
+      startTestSignal: boolean = true
+    ) => {
       let charsTypedAmount = typed.length;
       let totalCharsTypedAmount = charsTypedAmount + errors;
       let accuracy =
@@ -154,7 +156,7 @@ const TypingTestTextBox = forwardRef<HTMLDivElement, Props>(
           ? 0
           : Math.round((charsTypedAmount / totalCharsTypedAmount) * 100);
 
-      onKeyPress(charsTypedAmount, accuracy);
+      onKeyPress(charsTypedAmount, accuracy, startTestSignal);
     };
 
     // Shows cursor
@@ -195,26 +197,21 @@ const TypingTestTextBox = forwardRef<HTMLDivElement, Props>(
       };
     }, [intervalLastInput]);
 
-    // Restart handler
+    // Regenerate test
     useEffect(() => {
-      if (!testInProgress && !testFinished) {
-        setUntypedChars(generateRandomWordListString(words));
-        setTypedChars("");
-        setErrorChars("");
-      }
-    }, [testInProgress, testFinished]);
+      setUntypedChars(generateRandomWordListString(words));
+      setTypedChars("");
+      setErrorChars("");
+    }, [regenerateTestSignal]);
 
     useEffect(() => {
-      if (testFinishedSignal) {
-        updateStats(typedChars, errorAmount);
-        onTestFinishedSignal();
-      }
-    }, [testFinishedSignal]);
+      updateStats(typedChars, errorAmount, false);
+    }, [updateStatsSignal]);
 
     return (
       <div
         id="typing-test-container"
-        className="d-flex"
+        className={hidden ? "display-none" : ""}
         onKeyDown={(event) => handleKeyPress(event)}
         ref={ref}
         tabIndex={0}
