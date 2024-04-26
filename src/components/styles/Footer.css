@@ -1,6 +1,18 @@
 #footer {
   background-color: rgb(240, 240, 240);
   padding: 4em;
+  position: relative;
+}
+
+#footer #footer-arrow {
+  position: absolute;
+  left: calc(50% - 25px);
+  top: -60px;
+}
+
+#footer svg:hover {
+  color: rgb(81, 81, 81);
+  cursor: pointer;
 }
 
 #footer div {
