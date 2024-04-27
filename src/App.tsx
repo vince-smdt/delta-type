@@ -71,7 +71,7 @@ function App() {
   const changeTestDuration = (durationInSeconds: number, buttonId: number) => {
     setTestDuration(durationInSeconds);
     setSelectedTimeButtonId(buttonId);
-    setCookie("selectedTimeId", buttonId);
+    setCookie("selectedTimeId", buttonId); // TODO - refreshing page too quickly calls this before cookies are read, resetting value
 
     // Auto-focus typing test text box
     textBoxRef.current?.focus();
@@ -81,7 +81,7 @@ function App() {
     setSelectedWordListButtonId(buttonId);
     setSelectedWordList(wordList);
     setRegenerateTestSignal(!regenerateTestSignal);
-    setCookie("selectedWordListId", buttonId);
+    setCookie("selectedWordListId", buttonId); // TODO - refreshing page too quickly calls this before cookies are read, resetting value
 
     // Auto-focus typing test text box
     textBoxRef.current?.focus();
@@ -122,15 +122,22 @@ function App() {
     textBoxRef.current?.focus();
 
     // Read/Set cookie values
-    if (cookies.selectedTimeId === undefined) setCookie("selectedTimeId", 2);
-    if (cookies.selectedWordListId === undefined)
+    if (cookies.selectedTimeId === undefined) {
+      setCookie("selectedTimeId", 2);
+      setSelectedTimeButtonId(2);
+    } else setSelectedTimeButtonId(cookies.selectedTimeId);
+
+    if (cookies.selectedWordListId === undefined) {
       setCookie("selectedWordListId", 0);
-    if (cookies.darkMode === undefined) setCookie("darkMode", false);
+      setSelectedWordListButtonId(0);
+    } else setSelectedWordListButtonId(cookies.selectedWordListId);
 
-    setSelectedTimeButtonId(cookies.selectedTimeId);
-    setSelectedWordListButtonId(cookies.selectedWordListId);
-    setDarkMode(cookies.darkMode);
+    if (cookies.darkMode === undefined) {
+      setCookie("darkMode", false);
+      setDarkMode(false);
+    } else setDarkMode(cookies.darkMode);
 
+    // Send signals to update time and word list from cookies
     setUpdateTimeSignal(!updateTimeSignal);
     setUpdateWordListSignal(!updateWordListSignal);
 
