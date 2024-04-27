@@ -6,8 +6,10 @@ import TimeButton from "./components/TimeButton";
 import TypingTestStats from "./components/TypingTestStats";
 import TypingTestTextBox from "./components/TypingTestTextBox";
 import TypingTestTimer from "./components/TypingTestTimer";
+import WordListButton from "./components/WordListButton";
 import _100mostCommonEnglishWords from "./data/100mostCommonEnglishWords";
 import _1000mostCommonEnglishWords from "./data/100mostCommonEnglishWords";
+import _javascriptKeywords from "./data/javascriptKeywords";
 import "./App.css";
 
 function App() {
@@ -19,6 +21,9 @@ function App() {
   let [testWPM, setTestWPM] = useState(0);
   let [testCharsTyped, setTestCharsTyped] = useState(0);
   let [testAccuracy, setTestAccuracy] = useState(0);
+  let [selectedWordList, setSelectedWordList] = useState(
+    _100mostCommonEnglishWords
+  );
 
   // Signals
   let [updateStatsSignal, setUpdateStatsSignal] = useState(false);
@@ -26,8 +31,8 @@ function App() {
 
   // Selected options
   let [selectedTimeButtonId, setSelectedTimeButtonId] = useState(2);
+  let [selectedWordListButtonId, setSelectedWordListButtonId] = useState(0);
 
-  const words = _1000mostCommonEnglishWords;
   const length = 10000;
   const textBoxRef = useRef<HTMLDivElement>(null); // TypingTestTextBox ref
 
@@ -59,6 +64,15 @@ function App() {
   const changeTestDuration = (durationInSeconds: number, buttonId: number) => {
     setTestDuration(durationInSeconds);
     setSelectedTimeButtonId(buttonId);
+
+    // Auto-focus typing test text box
+    textBoxRef.current?.focus();
+  };
+
+  const changeWordList = (wordList: string[], buttonId: number) => {
+    setSelectedWordListButtonId(buttonId);
+    setSelectedWordList(wordList);
+    setRegenerateTestSignal(!regenerateTestSignal);
 
     // Auto-focus typing test text box
     textBoxRef.current?.focus();
@@ -102,6 +116,34 @@ function App() {
     <div>
       <Header />
       <div id="global-box">
+        {!testInProgress && !testFinished && (
+          <div id="word-list-buttons">
+            <WordListButton
+              bigText="100"
+              smallText="most common english words"
+              id={0}
+              selectedId={selectedWordListButtonId}
+              wordList={_100mostCommonEnglishWords}
+              onClick={changeWordList}
+            />
+            <WordListButton
+              bigText="10000"
+              smallText="most common english words"
+              id={1}
+              selectedId={selectedWordListButtonId}
+              wordList={_1000mostCommonEnglishWords}
+              onClick={changeWordList}
+            />
+            <WordListButton
+              bigText="JavaScript"
+              smallText="keywords and functions"
+              id={2}
+              selectedId={selectedWordListButtonId}
+              wordList={_javascriptKeywords}
+              onClick={changeWordList}
+            />
+          </div>
+        )}
         {!testInProgress && !testFinished && (
           <div id="time-buttons">
             <TimeButton
@@ -159,7 +201,7 @@ function App() {
         )}
         <TypingTestTextBox
           ref={textBoxRef}
-          words={words}
+          words={selectedWordList}
           wordsAmount={length}
           updateStatsSignal={updateStatsSignal}
           regenerateTestSignal={regenerateTestSignal}

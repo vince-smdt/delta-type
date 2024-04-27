@@ -22,6 +22,11 @@
   gap: 2em;
 }
 
+#word-list-buttons {
+  display:flex;
+  gap: 1.5em;
+}
+
 #time-buttons {
   display: flex;
   gap: 1.5em;

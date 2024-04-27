@@ -1,0 +1,31 @@
+.word-list-button {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  border: 4px solid black;
+  padding: 20px;
+  height: 90px;
+
+  cursor: pointer;
+  user-select: none;
+}
+
+.word-list-button:hover {
+  background-color: rgb(255, 230, 230);
+}
+
+.word-list-button.selected {
+  background-color: rgb(255, 190, 190);
+}
+
+.word-list-button div:nth-child(1) {
+  font-size: 34px;
+  line-height: 1em;
+  margin-top: 5px;
+}
+
+.word-list-button div:nth-child(2) {
+  font-size: 15px;
+}
