@@ -226,7 +226,7 @@ const TypingTestTextBox = forwardRef<HTMLDivElement, Props>(
         </div>
         <div id="cursor" ref={cursorRef}></div>
         <div id="untyped-chars" className="char-container">
-          <span className="text-dark">{untypedChars}</span>
+          <span>{untypedChars}</span>
         </div>
       </div>
     );

@@ -34,6 +34,7 @@ function App() {
   let [selectedWordListButtonId, setSelectedWordListButtonId] = useState(0);
 
   const length = 10000;
+  const appBoxRef = useRef<HTMLDivElement>(null);
   const textBoxRef = useRef<HTMLDivElement>(null); // TypingTestTextBox ref
 
   const updateStats = (charsTyped: number, accuracy: number) => {
@@ -98,6 +99,11 @@ function App() {
     textBoxRef.current?.focus();
   };
 
+  const toggleDarkMode = () => {
+    console.log("test");
+    appBoxRef.current?.classList.toggle("dark-mode");
+  };
+
   useEffect(() => {
     // Auto-focus typing test text box
     textBoxRef.current?.focus();
@@ -113,8 +119,8 @@ function App() {
   }, [testFinished]);
 
   return (
-    <div>
-      <Header />
+    <div ref={appBoxRef}>
+      <Header onClickDarkMode={toggleDarkMode} />
       <div id="global-box">
         {!testInProgress && !testFinished && (
           <div id="word-list-buttons">

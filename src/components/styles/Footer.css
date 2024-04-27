@@ -4,6 +4,10 @@
   position: relative;
 }
 
+.dark-mode #footer {
+  background-color: rgb(40, 40, 40);
+}
+
 #footer #footer-arrow {
   position: absolute;
   left: calc(50% - 25px);
@@ -15,12 +19,21 @@
   cursor: pointer;
 }
 
+#footer svg:hover {
+  color: rgb(181, 181, 181);
+  cursor: pointer;
+}
+
 #footer div {
   text-align: center;
 }
 
 #footer div a {
   color: black;
+}
+
+.dark-mode #footer div a {
+  color: white;
 }
 
 #footer em {
