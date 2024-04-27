@@ -1,13 +1,14 @@
 #header {
   background-color: rgb(240, 240, 240);
-  padding: 5px 0;
+  height: 50px;
   text-align: center;
   font-size: 22px;
-  position: absolute;
-  left: 0;
-  top: 0;
   width: 100%;
   user-select: none;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .dark-mode #header {
@@ -30,6 +31,6 @@
 #header #dark-mode-icon {
   position: absolute;
   right: 20px;
-  top: 14px;
+  top: 18px;
   cursor: pointer;
 }

@@ -1,7 +1,7 @@
 * {
   margin: 0;
   padding: 0;
-
+  
   font-family: "Aleo", serif;
   font-optical-sizing: auto;
   font-weight: 400;
@@ -13,27 +13,56 @@
 }
 
 #global-box {
-  min-height: 100vh;
-
+  min-height: calc(100vh - 50px);
+  
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  gap: 2em;
+  gap: 1.5em;
+  margin: 0 20px;
 }
 
 #word-list-buttons {
-  display:flex;
-  gap: 1.5em;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  margin-top: 20px;
 }
 
 #time-buttons {
   display: flex;
-  gap: 1.5em;
+  justify-content: center;
+  align-items: center;
+  gap: 0 .8em;
+  width: 300px;
+  flex-wrap: wrap;
 }
 
 .dark-mode {
   background-color: rgb(25, 25, 25);
   color: white;
   border-color: white;
+}
+
+@media only screen and (min-width: 800px) {
+  #word-list-buttons {
+    flex-direction: row;
+    gap: 1.5em;
+  }
+
+  #time-buttons {
+    gap: 1.5em;
+  }
+}
+
+@media only screen and (min-width: 500px) {
+  #global-box {
+    gap: 2em;
+  }
+
+  #time-buttons {
+    width: auto;
+    flex-wrap: none;
+  }
 }

@@ -3,10 +3,11 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  text-align: center;
 
   border: 4px solid;
-  padding: 20px;
-  height: 90px;
+  padding: 20px 40px;
+  height: auto;
 
   cursor: pointer;
   user-select: none;
@@ -29,11 +30,32 @@
 }
 
 .word-list-button div:nth-child(1) {
-  font-size: 34px;
+  font-weight: 1000;
+  margin-right: 4px;
   line-height: 1em;
-  margin-top: 5px;
 }
 
 .word-list-button div:nth-child(2) {
   font-size: 15px;
+}
+
+@media only screen and (min-width: 400px) {
+  .word-list-button {
+    flex-direction: row;
+    height: 50px;
+  }
+}
+
+@media only screen and (min-width: 800px) {
+  .word-list-button {
+    flex-direction: column;
+    height: 90px;
+    padding: 20px;
+  }
+  
+  .word-list-button div:nth-child(1) {
+    font-weight: normal;
+    margin-top: 5px;
+    font-size: 34px;
+  }
 }

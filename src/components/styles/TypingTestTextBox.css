@@ -1,4 +1,5 @@
 /* GLOBAL */
+
 .display-none {
   display: none !important;
 }
@@ -51,7 +52,7 @@
 .char-container {
   overflow: hidden;
   white-space: pre;
-  font-size: 40px;
+  font-size: 30px;
   line-height: normal;
   letter-spacing: 0.015em;
 }
@@ -59,13 +60,32 @@
 #typed-chars {
   display: flex;
   justify-content: flex-end;
-  width: 10em;
+  width: 40vw;
 }
 
 #untyped-chars {
-  width: 10em;
+  width: 40vw;
 }
 
 #error-chars {
   text-decoration-line: line-through;
+}
+
+
+/* RESPONSIVENESS */
+
+@media only screen and (min-width: 1000px) {
+  #typed-chars {
+    width: 10em;
+  }
+
+  #untyped-chars {
+    width: 10em;
+  }
+}
+
+@media only screen and (min-width: 800px) {
+  .char-container {
+    font-size: 40px;
+  }
 }

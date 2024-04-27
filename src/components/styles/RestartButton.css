@@ -1,4 +1,5 @@
 #restart-button {
   cursor: pointer;
   user-select: none;
+  margin-bottom: 65px;
 }
