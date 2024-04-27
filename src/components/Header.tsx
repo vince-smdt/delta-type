@@ -3,7 +3,7 @@ import "./styles/Header.css";
 const Header = () => {
   return (
     <div id="header">
-      <a href="http://127.0.0.1:5173/">
+      <a href="https://delta-type.netlify.app">
         Delta Type
         <svg
           xmlns="http://www.w3.org/2000/svg"
