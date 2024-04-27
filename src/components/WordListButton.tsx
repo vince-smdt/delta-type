@@ -7,6 +7,7 @@ interface Props {
   id: number;
   selectedId: number;
   wordList: string[];
+  updateWordListSignal: boolean;
   onClick: Function;
 }
 
@@ -16,6 +17,7 @@ const WordListButton = ({
   id,
   selectedId,
   wordList,
+  updateWordListSignal,
   onClick,
 }: Props) => {
   const buttonRef = useRef<HTMLDivElement>(null); // TypingTestTextBox ref
@@ -27,6 +29,11 @@ const WordListButton = ({
   useEffect(() => {
     buttonRef.current?.classList.toggle("selected", id === selectedId);
   }, [id, selectedId]);
+
+  useEffect(() => {
+    buttonRef.current?.classList.toggle("selected", id === selectedId);
+    if (id === selectedId) handleClick();
+  }, [updateWordListSignal]);
 
   return (
     <div className="word-list-button" onClick={handleClick} ref={buttonRef}>

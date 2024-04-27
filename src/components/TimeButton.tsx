@@ -6,10 +6,18 @@ interface Props {
   timeUnit: string; // "min" or "sec"
   id: number;
   selectedId: number;
+  updateTimeSignal: boolean;
   onClick: Function;
 }
 
-const TimeButton = ({ time, timeUnit, id, selectedId, onClick }: Props) => {
+const TimeButton = ({
+  time,
+  timeUnit,
+  id,
+  selectedId,
+  updateTimeSignal,
+  onClick,
+}: Props) => {
   const buttonRef = useRef<HTMLDivElement>(null); // TypingTestTextBox ref
 
   const handleClick = () => {
@@ -20,6 +28,11 @@ const TimeButton = ({ time, timeUnit, id, selectedId, onClick }: Props) => {
   useEffect(() => {
     buttonRef.current?.classList.toggle("selected", id === selectedId);
   }, [id, selectedId]);
+
+  useEffect(() => {
+    buttonRef.current?.classList.toggle("selected", id === selectedId);
+    if (id === selectedId) handleClick();
+  }, [updateTimeSignal]);
 
   return (
     <div className="time-button" onClick={handleClick} ref={buttonRef}>

@@ -19,7 +19,7 @@
 }
 
 .dark-mode .time-button:hover {
-  background-color: rgb(40, 100, 100);
+  background-color: rgb(49, 99, 120);
 }
 
 .time-button.selected {
@@ -27,7 +27,7 @@
 }
 
 .dark-mode .time-button.selected {
-  background-color: rgb(60, 150, 150);
+  background-color: rgb(69, 136, 165);
 }
 
 .time-button div:nth-child(1) {

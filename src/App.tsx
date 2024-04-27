@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useCookies } from "react-cookie";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import RestartButton from "./components/RestartButton";
@@ -28,10 +29,15 @@ function App() {
   // Signals
   let [updateStatsSignal, setUpdateStatsSignal] = useState(false);
   let [regenerateTestSignal, setRegenerateTestSignal] = useState(false);
+  let [updateTimeSignal, setUpdateTimeSignal] = useState(false);
+  let [updateWordListSignal, setUpdateWordListSignal] = useState(false);
 
   // Selected options
   let [selectedTimeButtonId, setSelectedTimeButtonId] = useState(2);
   let [selectedWordListButtonId, setSelectedWordListButtonId] = useState(0);
+
+  // Cookies
+  let [cookies, setCookie] = useCookies();
 
   const length = 10000;
   const appBoxRef = useRef<HTMLDivElement>(null);
@@ -65,6 +71,7 @@ function App() {
   const changeTestDuration = (durationInSeconds: number, buttonId: number) => {
     setTestDuration(durationInSeconds);
     setSelectedTimeButtonId(buttonId);
+    setCookie("selectedTimeId", buttonId);
 
     // Auto-focus typing test text box
     textBoxRef.current?.focus();
@@ -74,6 +81,7 @@ function App() {
     setSelectedWordListButtonId(buttonId);
     setSelectedWordList(wordList);
     setRegenerateTestSignal(!regenerateTestSignal);
+    setCookie("selectedWordListId", buttonId);
 
     // Auto-focus typing test text box
     textBoxRef.current?.focus();
@@ -100,13 +108,31 @@ function App() {
   };
 
   const toggleDarkMode = () => {
-    console.log("test");
-    appBoxRef.current?.classList.toggle("dark-mode");
+    let darkMode = appBoxRef.current?.classList.toggle("dark-mode");
+    setCookie("darkMode", darkMode);
+  };
+
+  const setDarkMode = (darkMode: boolean) => {
+    appBoxRef.current?.classList.toggle("dark-mode", darkMode);
+    setCookie("darkMode", darkMode);
   };
 
   useEffect(() => {
     // Auto-focus typing test text box
     textBoxRef.current?.focus();
+
+    // Read/Set cookie values
+    if (cookies.selectedTimeId === undefined) setCookie("selectedTimeId", 2);
+    if (cookies.selectedWordListId === undefined)
+      setCookie("selectedWordListId", 0);
+    if (cookies.darkMode === undefined) setCookie("darkMode", false);
+
+    setSelectedTimeButtonId(cookies.selectedTimeId);
+    setSelectedWordListButtonId(cookies.selectedWordListId);
+    setDarkMode(cookies.darkMode);
+
+    setUpdateTimeSignal(!updateTimeSignal);
+    setUpdateWordListSignal(!updateWordListSignal);
 
     // Every key press auto-focuses on the text box
     window.addEventListener("keydown", handleKeyPress);
@@ -130,6 +156,7 @@ function App() {
               id={0}
               selectedId={selectedWordListButtonId}
               wordList={_100mostCommonEnglishWords}
+              updateWordListSignal={updateWordListSignal}
               onClick={changeWordList}
             />
             <WordListButton
@@ -138,6 +165,7 @@ function App() {
               id={1}
               selectedId={selectedWordListButtonId}
               wordList={_1000mostCommonEnglishWords}
+              updateWordListSignal={updateWordListSignal}
               onClick={changeWordList}
             />
             <WordListButton
@@ -146,6 +174,7 @@ function App() {
               id={2}
               selectedId={selectedWordListButtonId}
               wordList={_javascriptKeywords}
+              updateWordListSignal={updateWordListSignal}
               onClick={changeWordList}
             />
           </div>
@@ -157,6 +186,7 @@ function App() {
               timeUnit="sec"
               id={0}
               selectedId={selectedTimeButtonId}
+              updateTimeSignal={updateTimeSignal}
               onClick={changeTestDuration}
             />
             <TimeButton
@@ -164,6 +194,7 @@ function App() {
               timeUnit="sec"
               id={1}
               selectedId={selectedTimeButtonId}
+              updateTimeSignal={updateTimeSignal}
               onClick={changeTestDuration}
             />
             <TimeButton
@@ -171,6 +202,7 @@ function App() {
               timeUnit="min"
               id={2}
               selectedId={selectedTimeButtonId}
+              updateTimeSignal={updateTimeSignal}
               onClick={changeTestDuration}
             />
             <TimeButton
@@ -178,6 +210,7 @@ function App() {
               timeUnit="min"
               id={3}
               selectedId={selectedTimeButtonId}
+              updateTimeSignal={updateTimeSignal}
               onClick={changeTestDuration}
             />
             <TimeButton
@@ -185,6 +218,7 @@ function App() {
               timeUnit="min"
               id={4}
               selectedId={selectedTimeButtonId}
+              updateTimeSignal={updateTimeSignal}
               onClick={changeTestDuration}
             />
           </div>
