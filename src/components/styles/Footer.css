@@ -19,7 +19,7 @@
   cursor: pointer;
 }
 
-#footer svg:hover {
+.dark-mode #footer svg:hover {
   color: rgb(181, 181, 181);
   cursor: pointer;
 }

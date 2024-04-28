@@ -3,3 +3,15 @@
   user-select: none;
   margin-bottom: 65px;
 }
+
+#restart-button:hover {
+  color: rgb(126, 126, 126);
+}
+
+.dark-mode #restart-button:hover {
+  color: rgb(181, 181, 181);
+}
+
+#restart-button svg {
+  margin-left: 2px;
+}
