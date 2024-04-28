@@ -1,4 +1,10 @@
-import { forwardRef, useRef, useEffect, useState, KeyboardEvent } from "react";
+import {
+  forwardRef,
+  useRef,
+  useEffect,
+  useState,
+  useImperativeHandle,
+} from "react";
 import "./styles/TypingTestTextBox.css";
 
 interface Props {
@@ -10,7 +16,7 @@ interface Props {
   onKeyPress: Function;
 }
 
-const TypingTestTextBox = forwardRef<HTMLDivElement, Props>(
+const TypingTestTextBox = forwardRef<HTMLInputElement, Props>(
   (
     {
       words,
@@ -23,6 +29,10 @@ const TypingTestTextBox = forwardRef<HTMLDivElement, Props>(
     ref
   ) => {
     const cursorRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    useImperativeHandle(ref, () => inputRef.current!, []);
+
     // Generates the string used for the typing test
     const generateRandomWordListString = (words: string[]) => {
       let wordListString = "";
@@ -169,6 +179,10 @@ const TypingTestTextBox = forwardRef<HTMLDivElement, Props>(
       cursorRef.current!.classList.add("not-visible");
     };
 
+    const focusTextBox = () => {
+      inputRef.current?.focus();
+    };
+
     // Cursor handler
     useEffect(() => {
       const backgroundHandleCursor = setInterval(() => {
@@ -212,11 +226,7 @@ const TypingTestTextBox = forwardRef<HTMLDivElement, Props>(
       <div
         id="typing-test-container"
         className={hidden ? "display-none" : ""}
-        onKeyDown={(event) => handleKeyPress(event)}
-        ref={ref}
-        tabIndex={0}
-        onFocus={onFocus}
-        onBlur={onBlur}
+        onClick={focusTextBox}
       >
         <div id="typed-chars" className="char-container">
           <span className="text-primary">{typedChars}</span>
@@ -228,6 +238,13 @@ const TypingTestTextBox = forwardRef<HTMLDivElement, Props>(
         <div id="untyped-chars" className="char-container">
           <span>{untypedChars}</span>
         </div>
+        <input
+          ref={inputRef}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          onKeyDown={(event) => handleKeyPress(event)}
+          id="focusable-input"
+        ></input>
       </div>
     );
   }

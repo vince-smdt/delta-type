@@ -71,6 +71,12 @@
   text-decoration-line: line-through;
 }
 
+#focusable-input {
+  position: absolute;
+  left: -9999px;
+  opacity: 0;
+}
+
 
 /* RESPONSIVENESS */
 

@@ -41,7 +41,7 @@ function App() {
 
   const length = 10000;
   const appBoxRef = useRef<HTMLDivElement>(null);
-  const textBoxRef = useRef<HTMLDivElement>(null); // TypingTestTextBox ref
+  const textBoxRef = useRef<HTMLInputElement>(null); // TypingTestTextBox ref
 
   const updateStats = (charsTyped: number, accuracy: number) => {
     let testMinutesElapsed = (Date.now() - testStartTime) / 60000;
