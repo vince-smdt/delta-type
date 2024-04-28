@@ -1,7 +1,21 @@
 # Delta Type
-An ergonomic and simple typing test website.
+An ergonomic and simple **typing speed test** website.
+
+Desktop and mobile platforms are both supported!
+
+---
+
+![GitHub Banner](./assets/banner2.png)
+
+---
+
+<p style="text-align: center; font-weight: 500; font-size: 30px;text-decoration: underline;">
+  Demo
+</p>
 
 ![Website Demo](./assets/demo.gif)
+
+---
 
 ## Link
 [Click here to access the website!](https://delta-type.netlify.app/)
