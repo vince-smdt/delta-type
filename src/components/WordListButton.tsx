@@ -22,8 +22,9 @@ const WordListButton = ({
 }: Props) => {
   const buttonRef = useRef<HTMLDivElement>(null); // TypingTestTextBox ref
 
-  const handleClick = () => {
-    onClick(wordList, id);
+  const handleClick = (updateCookie: boolean = true) => {
+    // "updateCookie" prevents overriding cookie with default value when page refreshed quickly multiple times
+    onClick(wordList, id, updateCookie);
   };
 
   useEffect(() => {
@@ -32,11 +33,15 @@ const WordListButton = ({
 
   useEffect(() => {
     buttonRef.current?.classList.toggle("selected", id === selectedId);
-    if (id === selectedId) handleClick();
+    if (id === selectedId) handleClick(false);
   }, [updateWordListSignal]);
 
   return (
-    <div className="word-list-button" onClick={handleClick} ref={buttonRef}>
+    <div
+      className="word-list-button"
+      onClick={() => handleClick()}
+      ref={buttonRef}
+    >
       <div>{bigText}</div>
       <div>{smallText}</div>
     </div>

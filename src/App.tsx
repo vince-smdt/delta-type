@@ -68,20 +68,30 @@ function App() {
     updateStats(charsTyped, accuracy);
   };
 
-  const changeTestDuration = (durationInSeconds: number, buttonId: number) => {
+  const changeTestDuration = (
+    durationInSeconds: number,
+    buttonId: number,
+    updateCookie: boolean
+  ) => {
     setTestDuration(durationInSeconds);
     setSelectedTimeButtonId(buttonId);
-    setCookie("selectedTimeId", buttonId); // TODO - refreshing page too quickly calls this before cookies are read, resetting value
+
+    if (updateCookie) setCookie("selectedTimeId", buttonId);
 
     // Auto-focus typing test text box
     textBoxRef.current?.focus();
   };
 
-  const changeWordList = (wordList: string[], buttonId: number) => {
+  const changeWordList = (
+    wordList: string[],
+    buttonId: number,
+    updateCookie: boolean
+  ) => {
     setSelectedWordListButtonId(buttonId);
     setSelectedWordList(wordList);
     setRegenerateTestSignal(!regenerateTestSignal);
-    setCookie("selectedWordListId", buttonId); // TODO - refreshing page too quickly calls this before cookies are read, resetting value
+
+    if (updateCookie) setCookie("selectedWordListId", buttonId);
 
     // Auto-focus typing test text box
     textBoxRef.current?.focus();
