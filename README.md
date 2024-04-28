@@ -1,5 +1,4 @@
 # Delta Type
-
 An ergonomic and simple typing test website.
 
 ![Website Demo](./assets/demo.gif)
@@ -17,7 +16,7 @@ npm install
 npm run dev
 ```
 
-### Compiles for production and preview
+### Compile for production and preview
 ```
 npm run build
 npm run preview
