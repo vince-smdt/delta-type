@@ -216,6 +216,7 @@ const TypingTestTextBox = forwardRef<HTMLInputElement, Props>(
       setUntypedChars(generateRandomWordListString(words));
       setTypedChars("");
       setErrorChars("");
+      setErrorAmount(0);
     }, [regenerateTestSignal]);
 
     useEffect(() => {
