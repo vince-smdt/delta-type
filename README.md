@@ -3,19 +3,23 @@ An ergonomic and simple **typing speed test** website.
 
 Desktop and mobile platforms are both supported!
 
----
-
 ![GitHub Banner](./assets/banner2.png)
-
----
-
-<p style="text-align: center; font-weight: 500; font-size: 30px;text-decoration: underline;">
-  Demo
-</p>
 
 ![Website Demo](./assets/demo.gif)
 
----
+### Word sets
+- 100 most common English words
+- 1000 most common English words
+- JavaScript reserved keywords and common functions
+
+### Test durations
+- 10 seconds
+- 30 seconds
+- 1 minute
+- 3 minutes
+- 5 minutes
+
+Also, **dark mode** is available! (Toggled by clicking the upper right semi-circle icon)
 
 ## Link
 [Click here to access the website!](https://delta-type.netlify.app/)
