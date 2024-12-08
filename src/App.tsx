@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import { useCookies } from "react-cookie";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
@@ -14,7 +14,7 @@ import {
   DEFAULT_WORD_LIST_OPTION_ID,
   DEFAULT_TIME_OPTION_ID
 } from "./TestOptions";
-import { TypingTestProvider } from './contexts/TypingTestContext';
+import { TypingTestContext } from './contexts/TypingTestContext';
 import "./App.css";
 
 type TestState = "ready" | "inProgress" | "finished"
@@ -27,13 +27,9 @@ function App() {
   let [testWPM, setTestWPM] = useState(0);
   let [testCharsTyped, setTestCharsTyped] = useState(0);
   let [testAccuracy, setTestAccuracy] = useState(0);
-  let [selectedWordList, setSelectedWordList] = useState(
-    wordListOptions[DEFAULT_WORD_LIST_OPTION_ID].wordList
-  );
 
   // Signals
   let [updateStatsSignal, setUpdateStatsSignal] = useState(false);
-  let [regenerateTestSignal, setRegenerateTestSignal] = useState(false);
 
   // Selected options
   let [selectedTimeButtonId, setSelectedTimeButtonId] = useState(DEFAULT_TIME_OPTION_ID);
@@ -42,9 +38,10 @@ function App() {
   // Cookies
   let [cookies, setCookie] = useCookies();
 
-  const length = 10000;
   const appBoxRef = useRef<HTMLDivElement>(null);
   const textBoxRef = useRef<HTMLInputElement>(null); // TypingTestTextBox ref
+
+  const { setWordList, regenerateTest } = useContext(TypingTestContext);
 
   const updateStats = (charsTyped: number, accuracy: number) => {
     let testMinutesElapsed = (Date.now() - testStartTime) / 60000;
@@ -79,7 +76,7 @@ function App() {
   };
 
   const restartTest = () => {
-    setRegenerateTestSignal(!regenerateTestSignal);
+    regenerateTest();
     setTestState("ready");
     textBoxRef.current?.focus();
   };
@@ -99,7 +96,7 @@ function App() {
     // If clicking on the same button repeatedly, test will regenerate once.
     // If clicking on a different word list button, test will regenerate twice (once here, and another time in the useEffect that captures the selectedWordListButtonId state).
     // We allow this for code simplicity sake (since we still want the test to regenerate when clicking on the same button). It doesn't seem to cause any performance issues.
-    setRegenerateTestSignal(!regenerateTestSignal);
+    regenerateTest();
     textBoxRef.current?.focus();
   }
 
@@ -135,8 +132,8 @@ function App() {
 
   useEffect(() => {
     const wordListOption = wordListOptions[selectedWordListButtonId];
-    setRegenerateTestSignal(!regenerateTestSignal);
-    setSelectedWordList(wordListOption.wordList);
+    regenerateTest();
+    setWordList(wordListOption.wordList);
     setCookie("selectedWordListId", selectedWordListButtonId);
   }, [selectedWordListButtonId]);
 
@@ -154,62 +151,59 @@ function App() {
   return (
     <div ref={appBoxRef}>
       <Header onClickDarkMode={toggleDarkMode} />
-      <TypingTestProvider wordList={selectedWordList}>
-        <div id="global-box">
-          {testState === "ready" && (
-            <>
-              <div id="word-list-buttons">
-                {Object.entries(wordListOptions).map(([id, option]) => (
-                  <WordListButton
-                    key={id}
-                    id={Number(id)}
-                    bigText={option.name}
-                    smallText={option.description}
-                    selectedId={selectedWordListButtonId}
-                    onClick={() => handleSelectedWordListButtonId(Number(id))}
-                  />
-                ))}
-              </div>
-              <div id="time-buttons">
-                {Object.entries(timeOptions).map(([id, option]) => (
-                  <TimeButton
-                    key={id}
-                    id={Number(id)}
-                    time={option.time}
-                    timeUnit={option.timeUnit}
-                    selectedId={selectedTimeButtonId}
-                    onClick={() => handleSelectedTimeButtonId(Number(id))}
-                  />
-                ))}
-              </div>
-            </>
-          )}
-          {(testState === "inProgress" || testState === "finished") && (
-            <TypingTestStats
-              wpm={testWPM}
-              charsTyped={testCharsTyped}
-              accuracy={testAccuracy}
-              testFinished={(testState === "finished")}
-            />
-          )}
-          {testState !== "finished" && (
-            <TypingTestTimer
-              duration={testDuration}
-              testStarted={(testState === "inProgress")}
-              startTime={testStartTime}
-              onFinish={stopTest}
-            />
-          )}
-          <TypingTestTextBox
-            ref={textBoxRef}
-            updateStatsSignal={updateStatsSignal}
-            regenerateTestSignal={regenerateTestSignal}
-            hidden={(testState === "finished")}
-            onKeyPress={handleTypingTestKeyPress}
+      <div id="global-box">
+        {testState === "ready" && (
+          <>
+            <div id="word-list-buttons">
+              {Object.entries(wordListOptions).map(([id, option]) => (
+                <WordListButton
+                  key={id}
+                  id={Number(id)}
+                  bigText={option.name}
+                  smallText={option.description}
+                  selectedId={selectedWordListButtonId}
+                  onClick={() => handleSelectedWordListButtonId(Number(id))}
+                />
+              ))}
+            </div>
+            <div id="time-buttons">
+              {Object.entries(timeOptions).map(([id, option]) => (
+                <TimeButton
+                  key={id}
+                  id={Number(id)}
+                  time={option.time}
+                  timeUnit={option.timeUnit}
+                  selectedId={selectedTimeButtonId}
+                  onClick={() => handleSelectedTimeButtonId(Number(id))}
+                />
+              ))}
+            </div>
+          </>
+        )}
+        {(testState === "inProgress" || testState === "finished") && (
+          <TypingTestStats
+            wpm={testWPM}
+            charsTyped={testCharsTyped}
+            accuracy={testAccuracy}
+            testFinished={(testState === "finished")}
           />
-          <RestartButton onClick={restartTest} />
-        </div>
-      </TypingTestProvider>
+        )}
+        {testState !== "finished" && (
+          <TypingTestTimer
+            duration={testDuration}
+            testStarted={(testState === "inProgress")}
+            startTime={testStartTime}
+            onFinish={stopTest}
+          />
+        )}
+        <TypingTestTextBox
+          ref={textBoxRef}
+          updateStatsSignal={updateStatsSignal}
+          hidden={(testState === "finished")}
+          onKeyPress={handleTypingTestKeyPress}
+        />
+        <RestartButton onClick={restartTest} />
+      </div>
       <Footer />
     </div>
   );

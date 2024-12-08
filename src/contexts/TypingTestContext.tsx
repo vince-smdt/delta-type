@@ -6,11 +6,13 @@ interface ThemeContextType {
   errorChars: string,
   untypedChars: string,
   errorAmount: number,
-  regenerateTest: Function,
+  wordList: string[],
   setTypedChars: Dispatch<SetStateAction<string>>,
   setErrorChars: Dispatch<SetStateAction<string>>,
   setUntypedChars: Dispatch<SetStateAction<string>>,
   setErrorAmount: Dispatch<SetStateAction<number>>,
+  setWordList: Dispatch<SetStateAction<string[]>>,
+  regenerateTest: Function,
 }
 
 export const TypingTestContext = createContext<ThemeContextType>({
@@ -18,31 +20,36 @@ export const TypingTestContext = createContext<ThemeContextType>({
   errorChars: "",
   untypedChars: "",
   errorAmount: 0,
+  wordList: [],
   setTypedChars: () => null,
   setErrorChars: () => null,
   setUntypedChars: () => null,
   setErrorAmount: () => null,
+  setWordList: () => null,
   regenerateTest: () => null,
 });
 
 interface Props {
-  wordList: string[],
   children: ReactNode,
 }
 
-export const TypingTestProvider: FC<Props> = ({ wordList, children }) => {
+export const TypingTestProvider: FC<Props> = ({ children }) => {
+  let [wordList, setWordList] = useState<string[]>([]);
   let [typedChars, setTypedChars] = useState("");
   let [errorChars, setErrorChars] = useState("");
-  let [untypedChars, setUntypedChars] = useState(generateRandomWordListString(wordList));
+  let [untypedChars, setUntypedChars] = useState("");
   let [errorAmount, setErrorAmount] = useState(0);
 
   const regenerateTest = () => {
     setUntypedChars(generateRandomWordListString(wordList));
+    setTypedChars("");
+    setErrorChars("");
+    setErrorAmount(0);
   }
 
   useEffect(() => {
-    console.log("INFO:", typedChars, errorChars, untypedChars, errorAmount, setTypedChars, setErrorChars, setUntypedChars, setErrorAmount);
-  }, [])
+    regenerateTest();
+  }, [wordList])
 
   return (
     <TypingTestContext.Provider value={{
@@ -50,10 +57,12 @@ export const TypingTestProvider: FC<Props> = ({ wordList, children }) => {
       errorChars,
       untypedChars,
       errorAmount,
+      wordList,
       setTypedChars,
       setErrorChars,
       setUntypedChars,
       setErrorAmount,
+      setWordList,
       regenerateTest,
     }}>
       {children}

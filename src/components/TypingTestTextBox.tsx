@@ -11,7 +11,6 @@ import "./styles/TypingTestTextBox.css";
 
 interface Props {
   updateStatsSignal: boolean;
-  regenerateTestSignal: boolean;
   hidden: boolean;
   onKeyPress: Function;
 }
@@ -20,7 +19,6 @@ const TypingTestTextBox = forwardRef<HTMLInputElement, Props>(
   (
     {
       updateStatsSignal,
-      regenerateTestSignal,
       hidden,
       onKeyPress,
     }: Props,
@@ -193,14 +191,6 @@ const TypingTestTextBox = forwardRef<HTMLInputElement, Props>(
         clearInterval(backgroundHandleCursor);
       };
     }, [intervalLastInput]);
-
-    // Regenerate test
-    useEffect(() => {
-      regenerateTest();
-      setTypedChars("");
-      setErrorChars("");
-      setErrorAmount(0);
-    }, [regenerateTestSignal]);
 
     useEffect(() => {
       updateStats(typedChars, errorAmount, false);
