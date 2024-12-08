@@ -8,9 +8,12 @@ import TypingTestStats from "./components/TypingTestStats";
 import TypingTestTextBox from "./components/TypingTestTextBox";
 import TypingTestTimer from "./components/TypingTestTimer";
 import WordListButton from "./components/WordListButton";
-import _100mostCommonEnglishWords from "./data/100mostCommonEnglishWords";
-import _1000mostCommonEnglishWords from "./data/100mostCommonEnglishWords";
-import _javascriptKeywords from "./data/javascriptKeywords";
+import {
+  wordListOptions,
+  timeOptions,
+  DEFAULT_WORD_LIST_OPTION_ID,
+  DEFAULT_TIME_OPTION_ID
+} from "./TestOptions";
 import "./App.css";
 
 function App() {
@@ -23,7 +26,7 @@ function App() {
   let [testCharsTyped, setTestCharsTyped] = useState(0);
   let [testAccuracy, setTestAccuracy] = useState(0);
   let [selectedWordList, setSelectedWordList] = useState(
-    _100mostCommonEnglishWords
+    wordListOptions[DEFAULT_WORD_LIST_OPTION_ID].wordList
   );
 
   // Signals
@@ -133,13 +136,13 @@ function App() {
 
     // Read/Set cookie values
     if (cookies.selectedTimeId === undefined) {
-      setCookie("selectedTimeId", 2);
-      setSelectedTimeButtonId(2);
+      setCookie("selectedTimeId", DEFAULT_TIME_OPTION_ID);
+      setSelectedTimeButtonId(DEFAULT_TIME_OPTION_ID);
     } else setSelectedTimeButtonId(cookies.selectedTimeId);
 
     if (cookies.selectedWordListId === undefined) {
-      setCookie("selectedWordListId", 0);
-      setSelectedWordListButtonId(0);
+      setCookie("selectedWordListId", DEFAULT_WORD_LIST_OPTION_ID);
+      setSelectedWordListButtonId(DEFAULT_WORD_LIST_OPTION_ID);
     } else setSelectedWordListButtonId(cookies.selectedWordListId);
 
     if (cookies.darkMode === undefined) {
@@ -167,77 +170,31 @@ function App() {
       <div id="global-box">
         {!testInProgress && !testFinished && (
           <div id="word-list-buttons">
-            <WordListButton
-              bigText="100"
-              smallText="most common english words"
-              id={0}
-              selectedId={selectedWordListButtonId}
-              wordList={_100mostCommonEnglishWords}
-              updateWordListSignal={updateWordListSignal}
-              onClick={changeWordList}
-            />
-            <WordListButton
-              bigText="10000"
-              smallText="most common english words"
-              id={1}
-              selectedId={selectedWordListButtonId}
-              wordList={_1000mostCommonEnglishWords}
-              updateWordListSignal={updateWordListSignal}
-              onClick={changeWordList}
-            />
-            <WordListButton
-              bigText="JavaScript"
-              smallText="keywords and functions"
-              id={2}
-              selectedId={selectedWordListButtonId}
-              wordList={_javascriptKeywords}
-              updateWordListSignal={updateWordListSignal}
-              onClick={changeWordList}
-            />
+            {Object.entries(wordListOptions).map(([id, option]) => (
+              <WordListButton
+                id={Number(id)}
+                bigText={option.name}
+                smallText={option.description}
+                selectedId={selectedWordListButtonId}
+                wordList={option.wordList}
+                updateWordListSignal={updateWordListSignal}
+                onClick={changeWordList}
+              />
+            ))}
           </div>
         )}
         {!testInProgress && !testFinished && (
           <div id="time-buttons">
-            <TimeButton
-              time={10}
-              timeUnit="sec"
-              id={0}
-              selectedId={selectedTimeButtonId}
-              updateTimeSignal={updateTimeSignal}
-              onClick={changeTestDuration}
-            />
-            <TimeButton
-              time={30}
-              timeUnit="sec"
-              id={1}
-              selectedId={selectedTimeButtonId}
-              updateTimeSignal={updateTimeSignal}
-              onClick={changeTestDuration}
-            />
-            <TimeButton
-              time={1}
-              timeUnit="min"
-              id={2}
-              selectedId={selectedTimeButtonId}
-              updateTimeSignal={updateTimeSignal}
-              onClick={changeTestDuration}
-            />
-            <TimeButton
-              time={3}
-              timeUnit="min"
-              id={3}
-              selectedId={selectedTimeButtonId}
-              updateTimeSignal={updateTimeSignal}
-              onClick={changeTestDuration}
-            />
-            <TimeButton
-              time={5}
-              timeUnit="min"
-              id={4}
-              selectedId={selectedTimeButtonId}
-              updateTimeSignal={updateTimeSignal}
-              onClick={changeTestDuration}
-            />
+            {Object.entries(timeOptions).map(([id, option]) => (
+              <TimeButton
+                id={Number(id)}
+                time={option.time}
+                timeUnit={option.timeUnit}
+                selectedId={selectedTimeButtonId}
+                updateTimeSignal={updateTimeSignal}
+                onClick={changeTestDuration}
+              />
+            ))}
           </div>
         )}
         {(testInProgress || testFinished) && (
