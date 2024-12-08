@@ -16,12 +16,13 @@ import {
 } from "./TestOptions";
 import "./App.css";
 
+type TestState = "ready" | "inProgress" | "finished"
+
 function App() {
   // Test info & states
   let [testDuration, setTestDuration] = useState(60);
   let [testStartTime, setTestStartTime] = useState(Date.now());
-  let [testInProgress, setTestInProgress] = useState(false);
-  let [testFinished, setTestFinished] = useState(false);
+  let [testState, setTestState] = useState<TestState>("ready");
   let [testWPM, setTestWPM] = useState(0);
   let [testCharsTyped, setTestCharsTyped] = useState(0);
   let [testAccuracy, setTestAccuracy] = useState(0);
@@ -36,8 +37,8 @@ function App() {
   let [updateWordListSignal, setUpdateWordListSignal] = useState(false);
 
   // Selected options
-  let [selectedTimeButtonId, setSelectedTimeButtonId] = useState(2);
-  let [selectedWordListButtonId, setSelectedWordListButtonId] = useState(0);
+  let [selectedTimeButtonId, setSelectedTimeButtonId] = useState(DEFAULT_TIME_OPTION_ID);
+  let [selectedWordListButtonId, setSelectedWordListButtonId] = useState(DEFAULT_WORD_LIST_OPTION_ID);
 
   // Cookies
   let [cookies, setCookie] = useCookies();
@@ -67,7 +68,7 @@ function App() {
     accuracy: number,
     startTestCondition: boolean
   ) => {
-    if (!testInProgress && startTestCondition) startTest();
+    if (testState === "ready" && startTestCondition) startTest();
     updateStats(charsTyped, accuracy);
   };
 
@@ -101,20 +102,18 @@ function App() {
   };
 
   const startTest = () => {
-    setTestInProgress(true);
+    setTestState("inProgress");
     setTestStartTime(Date.now());
   };
 
   const stopTest = () => {
     setUpdateStatsSignal(!updateStatsSignal);
-    setTestInProgress(false);
-    setTestFinished(true);
+    setTestState("finished");
   };
 
   const restartTest = () => {
     setRegenerateTestSignal(!regenerateTestSignal);
-    setTestInProgress(false);
-    setTestFinished(false);
+    setTestState("ready");
 
     // Auto-focus typing test text box
     textBoxRef.current?.focus();
@@ -162,53 +161,53 @@ function App() {
   useEffect(() => {
     // Auto-focus typing test text box
     textBoxRef.current?.focus();
-  }, [testFinished]);
+  }, []);
 
   return (
     <div ref={appBoxRef}>
       <Header onClickDarkMode={toggleDarkMode} />
       <div id="global-box">
-        {!testInProgress && !testFinished && (
-          <div id="word-list-buttons">
-            {Object.entries(wordListOptions).map(([id, option]) => (
-              <WordListButton
-                id={Number(id)}
-                bigText={option.name}
-                smallText={option.description}
-                selectedId={selectedWordListButtonId}
-                wordList={option.wordList}
-                updateWordListSignal={updateWordListSignal}
-                onClick={changeWordList}
-              />
-            ))}
-          </div>
+        {testState === "ready" && (
+          <>
+            <div id="word-list-buttons">
+              {Object.entries(wordListOptions).map(([id, option]) => (
+                <WordListButton
+                  id={Number(id)}
+                  bigText={option.name}
+                  smallText={option.description}
+                  selectedId={selectedWordListButtonId}
+                  wordList={option.wordList}
+                  updateWordListSignal={updateWordListSignal}
+                  onClick={changeWordList}
+                />
+              ))}
+            </div>
+            <div id="time-buttons">
+              {Object.entries(timeOptions).map(([id, option]) => (
+                <TimeButton
+                  id={Number(id)}
+                  time={option.time}
+                  timeUnit={option.timeUnit}
+                  selectedId={selectedTimeButtonId}
+                  updateTimeSignal={updateTimeSignal}
+                  onClick={changeTestDuration}
+                />
+              ))}
+            </div>
+          </>
         )}
-        {!testInProgress && !testFinished && (
-          <div id="time-buttons">
-            {Object.entries(timeOptions).map(([id, option]) => (
-              <TimeButton
-                id={Number(id)}
-                time={option.time}
-                timeUnit={option.timeUnit}
-                selectedId={selectedTimeButtonId}
-                updateTimeSignal={updateTimeSignal}
-                onClick={changeTestDuration}
-              />
-            ))}
-          </div>
-        )}
-        {(testInProgress || testFinished) && (
+        {(testState === "inProgress" || testState === "finished") && (
           <TypingTestStats
             wpm={testWPM}
             charsTyped={testCharsTyped}
             accuracy={testAccuracy}
-            testFinished={testFinished}
+            testFinished={(testState === "finished")}
           />
         )}
-        {!testFinished && (
+        {testState !== "finished" && (
           <TypingTestTimer
             duration={testDuration}
-            testStarted={testInProgress}
+            testStarted={(testState === "inProgress")}
             startTime={testStartTime}
             onFinish={stopTest}
           />
@@ -219,7 +218,7 @@ function App() {
           wordsAmount={length}
           updateStatsSignal={updateStatsSignal}
           regenerateTestSignal={regenerateTestSignal}
-          hidden={testFinished}
+          hidden={(testState === "finished")}
           onKeyPress={handleTypingTestKeyPress}
         />
         <RestartButton onClick={restartTest} />
