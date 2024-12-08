@@ -14,6 +14,7 @@ import {
   DEFAULT_WORD_LIST_OPTION_ID,
   DEFAULT_TIME_OPTION_ID
 } from "./TestOptions";
+import { TypingTestProvider } from './contexts/TypingTestContext';
 import "./App.css";
 
 type TestState = "ready" | "inProgress" | "finished"
@@ -153,62 +154,62 @@ function App() {
   return (
     <div ref={appBoxRef}>
       <Header onClickDarkMode={toggleDarkMode} />
-      <div id="global-box">
-        {testState === "ready" && (
-          <>
-            <div id="word-list-buttons">
-              {Object.entries(wordListOptions).map(([id, option]) => (
-                <WordListButton
-                  key={id}
-                  id={Number(id)}
-                  bigText={option.name}
-                  smallText={option.description}
-                  selectedId={selectedWordListButtonId}
-                  onClick={() => handleSelectedWordListButtonId(Number(id))}
-                />
-              ))}
-            </div>
-            <div id="time-buttons">
-              {Object.entries(timeOptions).map(([id, option]) => (
-                <TimeButton
-                  key={id}
-                  id={Number(id)}
-                  time={option.time}
-                  timeUnit={option.timeUnit}
-                  selectedId={selectedTimeButtonId}
-                  onClick={() => handleSelectedTimeButtonId(Number(id))}
-                />
-              ))}
-            </div>
-          </>
-        )}
-        {(testState === "inProgress" || testState === "finished") && (
-          <TypingTestStats
-            wpm={testWPM}
-            charsTyped={testCharsTyped}
-            accuracy={testAccuracy}
-            testFinished={(testState === "finished")}
+      <TypingTestProvider wordList={selectedWordList}>
+        <div id="global-box">
+          {testState === "ready" && (
+            <>
+              <div id="word-list-buttons">
+                {Object.entries(wordListOptions).map(([id, option]) => (
+                  <WordListButton
+                    key={id}
+                    id={Number(id)}
+                    bigText={option.name}
+                    smallText={option.description}
+                    selectedId={selectedWordListButtonId}
+                    onClick={() => handleSelectedWordListButtonId(Number(id))}
+                  />
+                ))}
+              </div>
+              <div id="time-buttons">
+                {Object.entries(timeOptions).map(([id, option]) => (
+                  <TimeButton
+                    key={id}
+                    id={Number(id)}
+                    time={option.time}
+                    timeUnit={option.timeUnit}
+                    selectedId={selectedTimeButtonId}
+                    onClick={() => handleSelectedTimeButtonId(Number(id))}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+          {(testState === "inProgress" || testState === "finished") && (
+            <TypingTestStats
+              wpm={testWPM}
+              charsTyped={testCharsTyped}
+              accuracy={testAccuracy}
+              testFinished={(testState === "finished")}
+            />
+          )}
+          {testState !== "finished" && (
+            <TypingTestTimer
+              duration={testDuration}
+              testStarted={(testState === "inProgress")}
+              startTime={testStartTime}
+              onFinish={stopTest}
+            />
+          )}
+          <TypingTestTextBox
+            ref={textBoxRef}
+            updateStatsSignal={updateStatsSignal}
+            regenerateTestSignal={regenerateTestSignal}
+            hidden={(testState === "finished")}
+            onKeyPress={handleTypingTestKeyPress}
           />
-        )}
-        {testState !== "finished" && (
-          <TypingTestTimer
-            duration={testDuration}
-            testStarted={(testState === "inProgress")}
-            startTime={testStartTime}
-            onFinish={stopTest}
-          />
-        )}
-        <TypingTestTextBox
-          ref={textBoxRef}
-          words={selectedWordList}
-          wordsAmount={length}
-          updateStatsSignal={updateStatsSignal}
-          regenerateTestSignal={regenerateTestSignal}
-          hidden={(testState === "finished")}
-          onKeyPress={handleTypingTestKeyPress}
-        />
-        <RestartButton onClick={restartTest} />
-      </div>
+          <RestartButton onClick={restartTest} />
+        </div>
+      </TypingTestProvider>
       <Footer />
     </div>
   );

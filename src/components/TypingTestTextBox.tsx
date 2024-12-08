@@ -4,12 +4,12 @@ import {
   useEffect,
   useState,
   useImperativeHandle,
+  useContext,
 } from "react";
+import { TypingTestContext } from '../contexts/TypingTestContext';
 import "./styles/TypingTestTextBox.css";
 
 interface Props {
-  words: string[];
-  wordsAmount: number;
   updateStatsSignal: boolean;
   regenerateTestSignal: boolean;
   hidden: boolean;
@@ -19,8 +19,6 @@ interface Props {
 const TypingTestTextBox = forwardRef<HTMLInputElement, Props>(
   (
     {
-      words,
-      wordsAmount,
       updateStatsSignal,
       regenerateTestSignal,
       hidden,
@@ -33,25 +31,10 @@ const TypingTestTextBox = forwardRef<HTMLInputElement, Props>(
 
     useImperativeHandle(ref, () => inputRef.current!, []);
 
-    // Generates the string used for the typing test
-    const generateRandomWordListString = (words: string[]) => {
-      let wordListString = "";
-      for (let i = 0; i < wordsAmount; i++) {
-        const randomWordIndex = Math.floor(Math.random() * words.length);
-        wordListString += words[randomWordIndex] + " ";
-      }
-      return wordListString.trim();
-    };
+    const { typedChars, errorChars, untypedChars, errorAmount, regenerateTest, setTypedChars, setErrorChars, setUntypedChars, setErrorAmount } = useContext(TypingTestContext);
 
     // For cursor blinking animation
     let [intervalLastInput, setIntervalLastInput] = useState(0);
-    // Strings containing the contents of the typing test text box
-    let [typedChars, setTypedChars] = useState("");
-    let [errorChars, setErrorChars] = useState("");
-    let [untypedChars, setUntypedChars] = useState(
-      generateRandomWordListString(words)
-    );
-    let [errorAmount, setErrorAmount] = useState(0);
 
     const backspace = () => {
       let syncedTypedChars = typedChars;
@@ -213,7 +196,7 @@ const TypingTestTextBox = forwardRef<HTMLInputElement, Props>(
 
     // Regenerate test
     useEffect(() => {
-      setUntypedChars(generateRandomWordListString(words));
+      regenerateTest();
       setTypedChars("");
       setErrorChars("");
       setErrorAmount(0);
