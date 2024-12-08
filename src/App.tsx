@@ -33,8 +33,6 @@ function App() {
   // Signals
   let [updateStatsSignal, setUpdateStatsSignal] = useState(false);
   let [regenerateTestSignal, setRegenerateTestSignal] = useState(false);
-  let [updateTimeSignal, setUpdateTimeSignal] = useState(false);
-  let [updateWordListSignal, setUpdateWordListSignal] = useState(false);
 
   // Selected options
   let [selectedTimeButtonId, setSelectedTimeButtonId] = useState(DEFAULT_TIME_OPTION_ID);
@@ -57,10 +55,7 @@ function App() {
 
   const handleKeyPress = (event: KeyboardEvent) => {
     textBoxRef.current?.focus();
-
-    if (event.key === " ") {
-      event.preventDefault();
-    }
+    if (event.key === " ") event.preventDefault();
   };
 
   const handleTypingTestKeyPress = (
@@ -70,35 +65,6 @@ function App() {
   ) => {
     if (testState === "ready" && startTestCondition) startTest();
     updateStats(charsTyped, accuracy);
-  };
-
-  const changeTestDuration = (
-    durationInSeconds: number,
-    buttonId: number,
-    updateCookie: boolean
-  ) => {
-    setTestDuration(durationInSeconds);
-    setSelectedTimeButtonId(buttonId);
-
-    if (updateCookie) setCookie("selectedTimeId", buttonId);
-
-    // Auto-focus typing test text box
-    textBoxRef.current?.focus();
-  };
-
-  const changeWordList = (
-    wordList: string[],
-    buttonId: number,
-    updateCookie: boolean
-  ) => {
-    setSelectedWordListButtonId(buttonId);
-    setSelectedWordList(wordList);
-    setRegenerateTestSignal(!regenerateTestSignal);
-
-    if (updateCookie) setCookie("selectedWordListId", buttonId);
-
-    // Auto-focus typing test text box
-    textBoxRef.current?.focus();
   };
 
   const startTest = () => {
@@ -114,8 +80,6 @@ function App() {
   const restartTest = () => {
     setRegenerateTestSignal(!regenerateTestSignal);
     setTestState("ready");
-
-    // Auto-focus typing test text box
     textBoxRef.current?.focus();
   };
 
@@ -128,6 +92,20 @@ function App() {
     appBoxRef.current?.classList.toggle("dark-mode", darkMode);
     setCookie("darkMode", darkMode);
   };
+
+  const handleSelectedWordListButtonId = (id: number) => {
+    setSelectedWordListButtonId(id);
+    // If clicking on the same button repeatedly, test will regenerate once.
+    // If clicking on a different word list button, test will regenerate twice (once here, and another time in the useEffect that captures the selectedWordListButtonId state).
+    // We allow this for code simplicity sake (since we still want the test to regenerate when clicking on the same button). It doesn't seem to cause any performance issues.
+    setRegenerateTestSignal(!regenerateTestSignal);
+    textBoxRef.current?.focus();
+  }
+
+  const handleSelectedTimeButtonId = (id: number) => {
+    setSelectedTimeButtonId(id);
+    textBoxRef.current?.focus();
+  }
 
   useEffect(() => {
     // Auto-focus typing test text box
@@ -149,19 +127,28 @@ function App() {
       setDarkMode(false);
     } else setDarkMode(cookies.darkMode);
 
-    // Send signals to update time and word list from cookies
-    setUpdateTimeSignal(!updateTimeSignal);
-    setUpdateWordListSignal(!updateWordListSignal);
-
     // Every key press auto-focuses on the text box
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, []);
 
   useEffect(() => {
+    const wordListOption = wordListOptions[selectedWordListButtonId];
+    setRegenerateTestSignal(!regenerateTestSignal);
+    setSelectedWordList(wordListOption.wordList);
+    setCookie("selectedWordListId", selectedWordListButtonId);
+  }, [selectedWordListButtonId]);
+
+  useEffect(() => {
+    const timeOption = timeOptions[selectedTimeButtonId];
+    setTestDuration(timeOption.time * (timeOption.timeUnit === "min" ? 60 : 1));
+    setCookie("selectedTimeId", selectedTimeButtonId);
+  }, [selectedTimeButtonId]);
+
+  useEffect(() => {
     // Auto-focus typing test text box
     textBoxRef.current?.focus();
-  }, []);
+  }, [testState]);
 
   return (
     <div ref={appBoxRef}>
@@ -172,25 +159,24 @@ function App() {
             <div id="word-list-buttons">
               {Object.entries(wordListOptions).map(([id, option]) => (
                 <WordListButton
+                  key={id}
                   id={Number(id)}
                   bigText={option.name}
                   smallText={option.description}
                   selectedId={selectedWordListButtonId}
-                  wordList={option.wordList}
-                  updateWordListSignal={updateWordListSignal}
-                  onClick={changeWordList}
+                  onClick={() => handleSelectedWordListButtonId(Number(id))}
                 />
               ))}
             </div>
             <div id="time-buttons">
               {Object.entries(timeOptions).map(([id, option]) => (
                 <TimeButton
+                  key={id}
                   id={Number(id)}
                   time={option.time}
                   timeUnit={option.timeUnit}
                   selectedId={selectedTimeButtonId}
-                  updateTimeSignal={updateTimeSignal}
-                  onClick={changeTestDuration}
+                  onClick={() => handleSelectedTimeButtonId(Number(id))}
                 />
               ))}
             </div>
