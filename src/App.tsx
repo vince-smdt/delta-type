@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useContext } from "react";
 import { useCookies } from "react-cookie";
+import useTimer from "./hooks/useTimer";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import RestartButton from "./components/RestartButton";
@@ -21,8 +22,6 @@ type TestState = "ready" | "inProgress" | "finished"
 
 function App() {
   // Test info & states
-  let [testDuration, setTestDuration] = useState(60);
-  let [testStartTime, setTestStartTime] = useState(Date.now());
   let [testState, setTestState] = useState<TestState>("ready");
   let [testWPM, setTestWPM] = useState(0);
   let [testCharsTyped, setTestCharsTyped] = useState(0);
@@ -43,8 +42,15 @@ function App() {
 
   const { setWordList, regenerateTest } = useContext(TypingTestContext);
 
+  const stopTest = () => {
+    setUpdateStatsSignal(!updateStatsSignal);
+    setTestState("finished");
+  };
+
+  const { startTime, startTimer, restartTimer, setTimerDurationInSeconds, getTimeLeftString } = useTimer(stopTest);
+
   const updateStats = (charsTyped: number, accuracy: number) => {
-    let testMinutesElapsed = (Date.now() - testStartTime) / 60000;
+    let testMinutesElapsed = (Date.now() - startTime) / 60000;
     let wpm = Math.round(charsTyped / (6 * testMinutesElapsed));
     setTestWPM(wpm);
     setTestCharsTyped(charsTyped);
@@ -67,16 +73,12 @@ function App() {
 
   const startTest = () => {
     setTestState("inProgress");
-    setTestStartTime(Date.now());
-  };
-
-  const stopTest = () => {
-    setUpdateStatsSignal(!updateStatsSignal);
-    setTestState("finished");
+    startTimer();
   };
 
   const restartTest = () => {
     regenerateTest();
+    restartTimer();
     setTestState("ready");
     textBoxRef.current?.focus();
   };
@@ -139,7 +141,7 @@ function App() {
 
   useEffect(() => {
     const timeOption = timeOptions[selectedTimeButtonId];
-    setTestDuration(timeOption.time * (timeOption.timeUnit === "min" ? 60 : 1));
+    setTimerDurationInSeconds(timeOption.time * (timeOption.timeUnit === "min" ? 60 : 1));
     setCookie("selectedTimeId", selectedTimeButtonId);
   }, [selectedTimeButtonId]);
 
@@ -190,10 +192,7 @@ function App() {
         )}
         {testState !== "finished" && (
           <TypingTestTimer
-            duration={testDuration}
-            testStarted={(testState === "inProgress")}
-            startTime={testStartTime}
-            onFinish={stopTest}
+            timeLeftString={getTimeLeftString()}
           />
         )}
         <TypingTestTextBox

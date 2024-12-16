@@ -1,49 +1,11 @@
-import { useState } from "react";
 import "./styles/TypingTestTimer.css";
-import customSetInterval from "../customSetInterval";
 
 interface Props {
-  duration: number;
-  testStarted: boolean;
-  startTime: number;
-  onFinish: Function;
+  timeLeftString: string;
 }
 
-const TypingTestTimer = ({
-  duration,
-  testStarted,
-  startTime,
-  onFinish,
-}: Props) => {
-  let [timeLeftStr, setTimeLeftStr] = useState("0:00");
-  let [timerRung, setTimerRung] = useState(false);
-
-  const getTimeLeft = () => {
-    if (testStarted === false) return duration;
-
-    const elapsedSinceStart = (Date.now() - startTime) / 1000; // In seconds
-    return Math.max(duration - elapsedSinceStart, 0);
-  };
-
-  // Update timer display
-  customSetInterval(() => {
-    const timeLeft = getTimeLeft();
-    const minutes = Math.floor(timeLeft / 60);
-    const seconds = Math.floor(timeLeft % 60);
-
-    setTimeLeftStr(
-      minutes.toString() + ":" + seconds.toString().padStart(2, "0")
-    );
-
-    if (timeLeft === 0) {
-      if (!timerRung) {
-        onFinish();
-        setTimerRung(true);
-      }
-    } else setTimerRung(false);
-  }, 10);
-
-  return <div id="typing-test-timer">{timeLeftStr}</div>;
+const TypingTestTimer = ({timeLeftString}: Props) => {
+  return <div id="typing-test-timer">{timeLeftString}</div>;
 };
 
 export default TypingTestTimer;

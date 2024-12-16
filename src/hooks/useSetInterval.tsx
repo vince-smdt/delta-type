@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
-function customSetInterval(callback: Function, delay: number) {
+function useSetInterval(callback: Function, delay: number) {
   const savedCallback = useRef<Function>();
 
   // Remember the latest callback.
@@ -20,4 +20,4 @@ function customSetInterval(callback: Function, delay: number) {
   }, [delay]);
 }
 
-export default customSetInterval;
+export default useSetInterval;
