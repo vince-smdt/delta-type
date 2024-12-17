@@ -13,7 +13,6 @@ const useTimer = (onFinish: Function) => {
   const startTimer = (): void => {
     setStartTime(Date.now());
     setStarted(true);
-    console.log("START");
   }
 
   const restartTimer = (): void => {
@@ -42,12 +41,9 @@ const useTimer = (onFinish: Function) => {
   }
 
   const checkIfTimerFinished = (): void => {
-    console.log(finished, started);
-    console.log(Date.now() / 1000, (startTime + (duration * 1000)) / 1000)
     if (finished || !started) return;
 
     if (Date.now() > startTime + (duration * 1000)) {
-      console.log("FINISHED");
       setFinished(true);
       setStarted(false);
       if (onFinish) onFinish();

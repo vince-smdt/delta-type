@@ -18,42 +18,45 @@ import {
 import { TypingTestContext } from './contexts/TypingTestContext';
 import "./App.css";
 
-type TestState = "ready" | "inProgress" | "finished"
-
 function App() {
-  // Test info & states
-  let [testState, setTestState] = useState<TestState>("ready");
-  let [testWPM, setTestWPM] = useState(0);
-  let [testCharsTyped, setTestCharsTyped] = useState(0);
-  let [testAccuracy, setTestAccuracy] = useState(0);
-
-  // Signals
   let [updateStatsSignal, setUpdateStatsSignal] = useState(false);
-
-  // Selected options
   let [selectedTimeButtonId, setSelectedTimeButtonId] = useState(DEFAULT_TIME_OPTION_ID);
   let [selectedWordListButtonId, setSelectedWordListButtonId] = useState(DEFAULT_WORD_LIST_OPTION_ID);
 
-  // Cookies
   let [cookies, setCookie] = useCookies();
 
   const appBoxRef = useRef<HTMLDivElement>(null);
   const textBoxRef = useRef<HTMLInputElement>(null); // TypingTestTextBox ref
 
-  const { setWordList, regenerateTest } = useContext(TypingTestContext);
+  const {
+    testState,
+    testWPM,
+    testAccuracy,
+    totalCharsTyped,
+    setWordList,
+    setTestState,
+    setTestWPM,
+    setTestAccuracy,
+    regenerateTest
+  } = useContext(TypingTestContext);
 
   const stopTest = () => {
     setUpdateStatsSignal(!updateStatsSignal);
     setTestState("finished");
   };
 
-  const { startTime, startTimer, restartTimer, setTimerDurationInSeconds, getTimeLeftString } = useTimer(stopTest);
+  const {
+    startTime,
+    startTimer,
+    restartTimer,
+    setTimerDurationInSeconds,
+    getTimeLeftString
+  } = useTimer(stopTest);
 
   const updateStats = (charsTyped: number, accuracy: number) => {
     let testMinutesElapsed = (Date.now() - startTime) / 60000;
     let wpm = Math.round(charsTyped / (6 * testMinutesElapsed));
     setTestWPM(wpm);
-    setTestCharsTyped(charsTyped);
     setTestAccuracy(accuracy);
   };
 
@@ -185,7 +188,7 @@ function App() {
         {(testState === "inProgress" || testState === "finished") && (
           <TypingTestStats
             wpm={testWPM}
-            charsTyped={testCharsTyped}
+            charsTyped={totalCharsTyped}
             accuracy={testAccuracy}
             testFinished={(testState === "finished")}
           />

@@ -29,7 +29,7 @@ const TypingTestTextBox = forwardRef<HTMLInputElement, Props>(
 
     useImperativeHandle(ref, () => inputRef.current!, []);
 
-    const { typedChars, errorChars, untypedChars, errorAmount, regenerateTest, setTypedChars, setErrorChars, setUntypedChars, setErrorAmount } = useContext(TypingTestContext);
+    const { typedChars, errorChars, untypedChars, errorAmount, setTypedChars, setErrorChars, setUntypedChars, setErrorAmount } = useContext(TypingTestContext);
 
     // For cursor blinking animation
     let [intervalLastInput, setIntervalLastInput] = useState(0);
