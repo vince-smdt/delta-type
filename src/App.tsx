@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useContext } from "react";
+import { useState, useRef, useEffect, useContext, useMemo } from "react";
 import { useCookies } from "react-cookie";
 import useTimer from "./hooks/useTimer";
 import Footer from "./components/Footer";
@@ -29,14 +29,12 @@ function App() {
   const textBoxRef = useRef<HTMLInputElement>(null); // TypingTestTextBox ref
 
   const {
+    typedChars,
     testState,
-    testWPM,
-    testAccuracy,
     totalCharsTyped,
+    errorAmount,
     setWordList,
     setTestState,
-    setTestWPM,
-    setTestAccuracy,
     regenerateTest
   } = useContext(TypingTestContext);
 
@@ -53,25 +51,24 @@ function App() {
     getTimeLeftString
   } = useTimer(stopTest);
 
-  const updateStats = (charsTyped: number, accuracy: number) => {
+  const wpm = useMemo(() => {
+    const AVERAGE_CHARS_TYPED_PER_SECOND = 6;
+    const FIRST_KEY_PRESS_WPM_ADJUSTMENT = 1 / (60*5);
     let testMinutesElapsed = (Date.now() - startTime) / 60000;
-    let wpm = Math.round(charsTyped / (6 * testMinutesElapsed));
-    setTestWPM(wpm);
-    setTestAccuracy(accuracy);
-  };
+    if (testMinutesElapsed === 0) testMinutesElapsed += FIRST_KEY_PRESS_WPM_ADJUSTMENT;
+    return Math.round(typedChars.length / (AVERAGE_CHARS_TYPED_PER_SECOND * testMinutesElapsed));
+  }, [typedChars, updateStatsSignal])
+
+  const accuracy = useMemo(() => {
+    const totalKeypresses = typedChars.length + errorAmount;
+    return totalKeypresses === 0
+      ? 0
+      : Math.round((typedChars.length / totalKeypresses) * 100);
+  }, [typedChars, errorAmount, updateStatsSignal]);
 
   const handleKeyPress = (event: KeyboardEvent) => {
     textBoxRef.current?.focus();
     if (event.key === " ") event.preventDefault();
-  };
-
-  const handleTypingTestKeyPress = (
-    charsTyped: number,
-    accuracy: number,
-    startTestCondition: boolean
-  ) => {
-    if (testState === "ready" && startTestCondition) startTest();
-    updateStats(charsTyped, accuracy);
   };
 
   const startTest = () => {
@@ -153,6 +150,10 @@ function App() {
     textBoxRef.current?.focus();
   }, [testState]);
 
+  useEffect(() => {
+    if (testState === "ready" && totalCharsTyped > 0) startTest();
+  }, [totalCharsTyped]);
+
   return (
     <div ref={appBoxRef}>
       <Header onClickDarkMode={toggleDarkMode} />
@@ -187,9 +188,9 @@ function App() {
         )}
         {(testState === "inProgress" || testState === "finished") && (
           <TypingTestStats
-            wpm={testWPM}
+            wpm={wpm}
             charsTyped={totalCharsTyped}
-            accuracy={testAccuracy}
+            accuracy={accuracy}
             testFinished={(testState === "finished")}
           />
         )}
@@ -200,9 +201,7 @@ function App() {
         )}
         <TypingTestTextBox
           ref={textBoxRef}
-          updateStatsSignal={updateStatsSignal}
           hidden={(testState === "finished")}
-          onKeyPress={handleTypingTestKeyPress}
         />
         <RestartButton onClick={restartTest} />
       </div>

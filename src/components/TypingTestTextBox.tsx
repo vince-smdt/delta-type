@@ -10,17 +10,13 @@ import { TypingTestContext } from '../contexts/TypingTestContext';
 import "./styles/TypingTestTextBox.css";
 
 interface Props {
-  updateStatsSignal: boolean;
   hidden: boolean;
-  onKeyPress: Function;
 }
 
 const TypingTestTextBox = forwardRef<HTMLInputElement, Props>(
   (
     {
-      updateStatsSignal,
       hidden,
-      onKeyPress,
     }: Props,
     ref
   ) => {
@@ -43,7 +39,6 @@ const TypingTestTextBox = forwardRef<HTMLInputElement, Props>(
         syncedTypedChars = typedChars.slice(0, -1);
         setTypedChars(syncedTypedChars);
       }
-      updateStats(syncedTypedChars, errorAmount);
     };
 
     const ctrlBackspace = () => {
@@ -93,7 +88,6 @@ const TypingTestTextBox = forwardRef<HTMLInputElement, Props>(
         syncedTypedChars = typedChars.slice(0, typedIndex + 1);
         setTypedChars(syncedTypedChars);
       }
-      updateStats(syncedTypedChars, errorAmount);
     };
 
     // Handle key presses when typing test text box is focused
@@ -131,23 +125,6 @@ const TypingTestTextBox = forwardRef<HTMLInputElement, Props>(
         syncedErrorAmount++;
         setErrorAmount(syncedErrorAmount);
       }
-      updateStats(syncedTypedChars, syncedErrorAmount);
-    };
-
-    // Calls parent keypress callback function, generates necessary info
-    const updateStats = (
-      typed: string,
-      errors: number,
-      startTestSignal: boolean = true
-    ) => {
-      let charsTypedAmount = typed.length;
-      let totalCharsTypedAmount = charsTypedAmount + errors;
-      let accuracy =
-        totalCharsTypedAmount === 0
-          ? 0
-          : Math.round((charsTypedAmount / totalCharsTypedAmount) * 100);
-
-      onKeyPress(charsTypedAmount, accuracy, startTestSignal);
     };
 
     // Shows cursor
@@ -191,10 +168,6 @@ const TypingTestTextBox = forwardRef<HTMLInputElement, Props>(
         clearInterval(backgroundHandleCursor);
       };
     }, [intervalLastInput]);
-
-    useEffect(() => {
-      updateStats(typedChars, errorAmount, false);
-    }, [updateStatsSignal]);
 
     return (
       <div
